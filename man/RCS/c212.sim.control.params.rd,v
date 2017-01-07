@@ -1,0 +1,107 @@
+head	1.2;
+access;
+symbols
+	rel_0_90:1.2
+	rel_0_89:1.2
+	rel_0_88:1.2
+	rel_0_87:1.2
+	rel_0_86:1.2
+	rel_0_85:1.2
+	rel_0_84:1.2
+	rel_0_83:1.2
+	rel_0_82:1.2
+	rel_0_81:1.2
+	rel_0_80:1.2
+	rel_0_78:1.2
+	rel_0_77:1.2
+	rel_0_76:1.1
+	rel_0_75:1.1
+	rel_0_74:1.1;
+locks
+	clb13102:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2016.08.29.11.24.46;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@\name{c212.sim.control.params}
+\alias{c212.sim.control.params}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Generate a template for the individual model parameter simulation control parameters.}
+\description{
+This function generates a template for overriding the global simulation parameters used by the model simulation functions (e.g. c212.BB).
+}
+%\details{
+%}
+
+\usage{
+	c212.sim.control.params(trial.data, model = "1a")
+}
+%- maybe also 'usage' for other objects documented here.
+
+\arguments{
+  \item{trial.data}{
+A file or data frame containing the trial data, either for end of trial or interim analysis.
+}
+  \item{model}{
+Allowed values are "BB" and "1a" for point-mass and non-point-mass models respectively.
+}
+}
+
+
+\value{
+A dataframe containing the simulation parameters template.
+}
+\author{
+R. Carragher
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+\dontrun{
+data(c212.trial.data)
+c212.sim.control.params(c212.trial.data)
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.sim.control.params}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+\keyword{Berry and Berry} % __ONLY ONE__ keyword per line
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 2
+a9 2
+\details{
+}
+d12 1
+a12 1
+	c212.sim.control.params(trial.data)
+d19 3
+@

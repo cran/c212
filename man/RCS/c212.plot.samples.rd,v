@@ -1,0 +1,122 @@
+head	1.2;
+access;
+symbols
+	rel_0_90:1.2
+	rel_0_89:1.2
+	rel_0_88:1.2
+	rel_0_87:1.2
+	rel_0_86:1.2
+	rel_0_85:1.2
+	rel_0_84:1.2
+	rel_0_83:1.2
+	rel_0_82:1.2
+	rel_0_81:1.2
+	rel_0_80:1.2
+	rel_0_78:1.2
+	rel_0_77:1.2
+	rel_0_76:1.2
+	rel_0_75:1.2
+	rel_0_74:1.1
+	rel_0_73:1.1
+	rel_0_72:1.1
+	rel_0_51:1.1
+	rel_0_5:1.1
+	rel_0_4:1.1
+	rel_0_3:1.1
+	rel_0_2:1.1
+	rel_0_1:1.1;
+locks
+	clb13102:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2015.02.23.16.36.40;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@\name{c212.plot.samples}
+\alias{c212.plot.samples}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Plot Posterior Distribution}
+\description{
+This function plots a graph of the sampled posterior distribution.
+}
+\details{
+Two graphs are displayed on the same panel. The left graph is the traceplot of the chains. The right graph is
+a plot of the distribution.
+}
+\usage{
+	c212.plot.samples(samples, title)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{samples}{
+An array of samples indexed by \emph{chain}.
+}
+  \item{title}{
+The graph title.
+}
+}
+\value{
+Nothing is returned.
+}
+\author{
+R. Carragher
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+\dontrun{
+data(c212.trial.data)
+raw = c212.1a(c212.trial.data)
+sample = raw$theta[,2,2,]
+c212.plot.samples(sample, sprintf("\%s: \%s \%s", "theta", raw$B[2], raw$AE[2]))
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.plot.samples}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 2
+a2 2
+\name{c212.BB.plot.samples}
+\alias{c212.BB.plot.samples}
+d13 1
+a13 1
+	c212.BB.plot.samples(samples, title)
+d35 2
+a36 1
+raw = c212.BBa("TDM14_MEDIUM_SIM162_REP500_R.dat")
+d38 1
+a38 1
+c212.BB.plot.samples(sample, sprintf("\%s: \%s \%s", "theta", raw$B[2], raw$AE[2]))
+d43 1
+a43 1
+\keyword{c212.BB.plot.samples}
+@

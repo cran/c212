@@ -1,0 +1,256 @@
+head	1.4;
+access;
+symbols
+	rel_0_90:1.4
+	rel_0_89:1.4
+	rel_0_88:1.4
+	rel_0_87:1.4
+	rel_0_86:1.4
+	rel_0_85:1.4
+	rel_0_84:1.4
+	rel_0_83:1.4
+	rel_0_82:1.4
+	rel_0_81:1.4
+	rel_0_80:1.4
+	rel_0_78:1.4
+	rel_0_77:1.3
+	rel_0_76:1.3
+	rel_0_75:1.3
+	rel_0_74:1.2
+	rel_0_73:1.2
+	rel_0_72:1.2
+	rel_0_51:1.2
+	rel_0_5:1.2
+	rel_0_4:1.2
+	rel_0_3:1.2
+	rel_0_2:1.2
+	rel_0_1:1.2;
+locks
+	clb13102:1.4; strict;
+comment	@# @;
+
+
+1.4
+date	2016.10.11.12.34.27;	author clb13102;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2015.03.17.12.01.13;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2015.02.23.16.36.40;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@\name{c212.convergence.diag}
+\alias{c212.convergence.diag}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Convergence Diagnostics of the Simulation}
+\description{
+The function applies either Gelman-Rubin or the Geweke diagnostic to the raw output of model simulation (e.g. c212.BB).
+It returns the convergence diagnostics and, if applicable, the acceptance rates for the sampling distributions.
+}
+\details{
+parameter is time consuming. This function applies one of two convergence diagnostics to the raw output of a model simulation
+in order to allow convergence to be assessed. The two diagnotics are:
+
+i) Gelman-Rubin diagnostic - used when there is more than one chain. A value close to 1 is consistent with
+an MCMC simulation which has converged. The `coda' diagnostic returns a point estimate and upper confidence
+limits.
+
+ii) Geweke diagnostic - used when there is a single chain. A Z-score which is consistent with a standard normal
+distribution is expected from an MCMC simulation which has converged.
+
+The raw sample data is converted to `coda' format (mcmc objects) and the `coda' methods gelman.diag and
+geweke.diag are used to perform the checks.
+}
+\usage{
+	c212.convergence.diag(raw, debug_diagnostic = FALSE)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{raw}{
+The output from a model simulation.
+}
+  \item{debug_diagnostic}{
+Unused parameter.
+}
+}
+\value{
+Returns a list of the diagnostics for each sampled variable. Each individual element of the list is a
+data.frame containing at least the columns \emph{type}, which is the type of diagnostic
+(`Gelman-Rubin' or `Geweke'), \emph{stat}, which is the value of the dignostic, and \emph{upper_ci} which is
+the upper confidence interval for the Gelman-Rubin diagnostic. For the Geweke diagnostic \emph{upper_ci}
+contains the value NA. Depending on the simulation performed the return from \emph{c212.convergence.diag} will contain different
+variables. The return for a simulation from \emph{c212.1a} is as follows:
+\preformatted{
+list(sim_type, gamma.conv.diag, theta.conv.diag, mu.gamma.conv.diag,
+                       mu.theta.conv.diag, sigma2.gamma.conv.diag,
+                       sigma2.theta.conv.diag, mu.gamma.0.conv.diag,
+                       mu.theta.0.conv.diag, tau2.gamma.0.conv.diag,
+                       tau2.theta.0.conv.diag)
+}
+Additional columns which may be used to indentify the individual samples are \emph{B}, the body-system, and
+\emph{AE}, the Adverse Event and \emph{interval}.
+}
+\author{
+R. Carragher
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+
+\dontrun{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data)
+conv = c212.convergence.diag(raw)
+}
+}
+
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.convergence.diag}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+\keyword{Gelman-Rubin}
+\keyword{Berry and Berry}
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d44 4
+a47 4
+                                mu.theta.conv.diag, sigma2.gamma.conv.diag,
+                                sigma2.theta.conv.diag, mu.gamma.0.conv.diag,
+                                mu.theta.0.conv.diag, tau2.gamma.0.conv.diag,
+                                tau2.theta.0.conv.diag)
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d1 2
+a2 2
+\name{c212.BB.convergence.diag}
+\alias{c212.BB.convergence.diag}
+d6 2
+a7 2
+The function applies either Gelman-Rubin or the Geweke diagnostic to the raw output of c212.BB and
+returns the output and, if applicable, the acceptance rates for the sampling distributions.
+d10 2
+a11 3
+The model fitted by c212.BB contains many parameters and individually assessing the convergence of each
+parameter is time consuming. This function applies one of two convergence diagnostics to the raw output of
+c212.BB in order to quickly assess convergence. The two diagnotics are:
+d24 1
+a24 1
+	c212.BB.convergence.diag(raw, debug_diagnostic = FALSE)
+d29 1
+a29 1
+The output from a call to c212.BB.
+d32 1
+a32 1
+Output debug information.
+d40 2
+a41 1
+contains the value NA.
+d50 1
+a50 1
+\emph{AE}, the Adverse Event.
+a58 39
+trial.data <- data.frame(B = c("BS6", "BS6", "BS7", "BS7", "BS6", "BS6",
+"BS5", "BS7", "BS6", "BS2", "BS2", "BS5", "BS4", "BS1", "BS6", "BS5",
+"BS4", "BS4", "BS2", "BS5", "BS1", "BS6", "BS8", "BS6", "BS3", "BS8",
+"BS8", "BS5", "BS6", "BS8", "BS5", "BS2", "BS6", "BS6", "BS3", "BS3",
+"BS8", "BS8", "BS6", "BS4", "BS5", "BS2", "BS3", "BS4", "BS5", "BS2",
+"BS3", "BS5", "BS6", "BS4", "BS8", "BS2", "BS6", "BS5", "BS5", "BS2",
+"BS3", "BS8", "BS6", "BS5", "BS8", "BS7", "BS3", "BS6", "BS4", "BS6",
+"BS6", "BS3", "BS4", "BS6", "BS3", "BS5", "BS5", "BS5", "BS6", "BS3",
+"BS6", "BS3", "BS7", "BS3", "BS3", "BS5", "BS8", "BS8", "BS4", "BS7",
+"BS6", "BS4", "BS3", "BS8"),
+AE = c("AE30", "AE33", "AE38", "AE39", "AE31", "AE31", "AE25", "AE37",
+"AE28", "AE3", "AE3", "AE24", "AE15", "AE1", "AE35", "AE18", "AE16",
+"AE17", "AE2", "AE23", "AE1", "AE35", "AE42", "AE27", "AE7", "AE43",
+"AE42", "AE24", "AE36", "AE40", "AE20", "AE4", "AE29", "AE27", "AE912",
+"AE910", "AE41", "AE45", "AE26", "AE16", "AE21", "AE5", "AE912", "AE14",
+"AE21", "AE5", "AE911", "AE23", "AE33", "AE14", "AE40", "AE4", "AE36",
+"AE22", "AE22", "AE2", "AE9", "AE45", "AE32", "AE25", "AE44", "AE39",
+"AE7", "AE34", "AE17", "AE34", "AE28", "AE6", "AE15", "AE29", "AE8",
+"AE19", "AE19", "AE20", "AE26", "AE8", "AE30", "AE910", "AE38", "AE6",
+"AE9", "AE18", "AE43", "AE44", "AE13", "AE37", "AE32", "AE13", "AE911",
+"AE41"),
+Group = c(2, 2, 2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2,
+1, 2, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 2, 1,
+2, 1, 2, 1, 2, 2, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2,
+1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2,
+1, 2, 2, 1, 2, 2, 1, 1, 1, 1),
+Count = c(20, 15, 25, 22, 24, 19, 49, 16, 12, 23, 18, 52, 19, 21, 18,
+51, 24, 22, 48, 57, 17, 20, 24, 20, 57, 20, 31, 56, 25, 19, 46, 25, 24,
+19, 22, 29, 20, 31, 28, 19, 66, 14, 60, 18, 51, 22, 52, 58, 22, 17, 12,
+14, 23, 57, 52, 28, 55, 18, 22, 52, 22, 24, 23, 27, 23, 26, 28, 22, 25,
+19, 23, 54, 54, 49, 22, 58, 21, 63, 22, 56, 23, 59, 25, 23, 27, 32, 13,
+20, 24, 23),
+Total = c(450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450))
+d61 4
+a64 1
+rm = c212.BBa(trial.data, nchains = 3)
+a66 4
+\dontrun{
+conv = c212.BB.convergence.diag(rm)
+}
+}
+d69 1
+a69 1
+\keyword{c212.BB.convergence.diag}
+d72 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+\title{Report on the Convergence of the Simulation}
+d6 2
+a7 2
+The function applies either Gelman-Rubin diagnostic or the Geweke diagnostic to the raw output of c212.BB and
+reports the acceptance rates for the sampling distributions if applicable.
+d33 1
+a33 1
+Output diagnostic information.
+@

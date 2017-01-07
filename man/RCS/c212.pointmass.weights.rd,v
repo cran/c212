@@ -1,0 +1,101 @@
+head	1.2;
+access;
+symbols
+	rel_0_90:1.2
+	rel_0_89:1.2
+	rel_0_88:1.2
+	rel_0_87:1.2
+	rel_0_86:1.2
+	rel_0_85:1.2
+	rel_0_84:1.2
+	rel_0_83:1.2
+	rel_0_82:1.2
+	rel_0_81:1.2
+	rel_0_80:1.2
+	rel_0_78:1.2
+	rel_0_77:1.2
+	rel_0_76:1.1
+	rel_0_75:1.1
+	rel_0_74:1.1;
+locks
+	clb13102:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2016.08.29.11.24.46;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@\name{c212.pointmass.weights}
+\alias{c212.pointmass.weights}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Generate a template for the point-mass weightings.}
+\description{
+This function generate a template for weights for the proposal distribution used to sample \emph{theta} variables in models which 
+use a point-mass.
+}
+%\details{
+%}
+
+\usage{
+	c212.pointmass.weights(trial.data)
+}
+%- maybe also 'usage' for other objects documented here.
+
+\arguments{
+  \item{trial.data}{
+A file or data frame containing the trial data, either for end of trial or interim analysis.
+}
+}
+
+
+\value{
+A dataframe containing the weightings template for each Body-system, adverse event and, if required, interval.
+}
+\author{
+R. Carragher
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+\dontrun{
+data(c212.trial.data)
+c212.pointmass.weights(c212.trial.data)
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.pointmass.weights}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+\keyword{Berry and Berry} % __ONLY ONE__ keyword per line
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d9 2
+a10 2
+\details{
+}
+@

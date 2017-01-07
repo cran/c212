@@ -1,0 +1,125 @@
+head	1.2;
+access;
+symbols
+	rel_0_90:1.2
+	rel_0_89:1.2
+	rel_0_88:1.2
+	rel_0_87:1.2
+	rel_0_86:1.2
+	rel_0_85:1.2
+	rel_0_84:1.2
+	rel_0_83:1.2
+	rel_0_82:1.2
+	rel_0_81:1.2
+	rel_0_80:1.2
+	rel_0_78:1.2
+	rel_0_77:1.2
+	rel_0_76:1.2
+	rel_0_75:1.2
+	rel_0_74:1.1
+	rel_0_73:1.1
+	rel_0_72:1.1
+	rel_0_51:1.1
+	rel_0_5:1.1
+	rel_0_4:1.1
+	rel_0_3:1.1
+	rel_0_2:1.1
+	rel_0_1:1.1;
+locks
+	clb13102:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2015.02.23.16.36.40;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@\name{c212.print.convergence.summary}
+\alias{c212.print.convergence.summary}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Print a Summary of the Convergence Diagnostics of the Simulation}
+\description{
+The function prints the maximum and minimum values of either Gelman-Rubin diagnostic or the Geweke diagnostic
+for each group of samples, e.g. theta, gamma, mu.gamma etc.
+}
+\usage{
+	c212.print.convergence.summary(conv)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{conv}{
+The output from a call to \emph{c212.check.convergence}.
+}
+}
+\value{
+Nothing
+}
+\author{
+R. Carragher
+}
+\note{
+The Geweke statistic is a Z-score calculated from a single chain. Due to the large number of variables sampled
+it is possible that a certain number will be deemed significant (at the 5\% level) even though the simulation
+may have converged.
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+\dontrun{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data)
+conv = c212.check.convergence(rm)
+c212.print.convergence.summary(conv)
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.print.convergence.summary}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+\keyword{Gelman-Rubin}
+\keyword{Berry and Berry}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 2
+a2 2
+\name{c212.BB.print.convergence.summary}
+\alias{c212.BB.print.convergence.summary}
+d10 1
+a10 1
+	c212.BB.print.convergence.summary(conv)
+d15 1
+a15 1
+The output from a call to c212.BB.check.convergence.
+d34 4
+a37 2
+conv = c212.BB.check.convergence(rm)
+c212.BB.print.convergence.summary(conv)
+d42 1
+a42 1
+\keyword{c212.BB.print.convergence.summary}
+d45 2
+@

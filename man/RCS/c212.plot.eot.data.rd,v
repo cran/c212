@@ -1,0 +1,208 @@
+head	1.4;
+access;
+symbols
+	rel_0_90:1.4
+	rel_0_89:1.4
+	rel_0_88:1.4
+	rel_0_87:1.4
+	rel_0_86:1.4
+	rel_0_85:1.4
+	rel_0_84:1.4
+	rel_0_83:1.4
+	rel_0_82:1.4
+	rel_0_81:1.4
+	rel_0_80:1.4
+	rel_0_78:1.4
+	rel_0_77:1.3
+	rel_0_76:1.2
+	rel_0_75:1.2
+	rel_0_74:1.1
+	rel_0_73:1.1
+	rel_0_72:1.1
+	rel_0_51:1.1
+	rel_0_5:1.1
+	rel_0_4:1.1
+	rel_0_3:1.1
+	rel_0_2:1.1
+	rel_0_1:1.1;
+locks
+	clb13102:1.4; strict;
+comment	@# @;
+
+
+1.4
+date	2016.10.11.12.34.27;	author clb13102;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2016.08.29.11.24.46;	author clb13102;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2016.08.26.16.00.42;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2015.02.23.16.36.40;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@\name{c212.plot.eot.data}
+\alias{c212.plot.eot.data}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Plot Adverse Event Incidence Data}
+\description{
+This function plots a graph of the total adverse event incidence counts by body-system and by individual
+adverse event for end of trial data. }
+\details{
+Two graphs are displayed on the same panel. The top graph is of AE Incidence Counts by Body-System. The
+lower graphs is of the Individual AE Incidence Counts.
+}
+\usage{
+	c212.plot.eot.data(trial.data, legend = TRUE, interactive = FALSE,
+		cex = 0.5)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{trial.data}{
+A file or data frame containing the trial data. The data frame must contain the columns \emph{B} (body-system), \emph{AE} (adverse event), \emph{Group} (1 - control, 2 treatment), \emph{Count} (total number of events), \emph{Total} (total number of participants).
+}
+  \item{legend}{
+Boolean. If TRUE print a legend.
+}
+  \item{interactive}{
+Boolean. If TRUE allow the user to identify individual adverse events on the individual adverse events graph.
+}
+  \item{cex}{
+Font size of the labels on the Adverse Event counts graph.
+}
+}
+\value{
+Nothing is returned.
+}
+\author{
+R. Carragher
+}
+\note{
+The legend may obscure a portion of the graph. In this case the legend may be supressed by choosing \emph{legend = FALSE} when calling the function.
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+\dontrun{
+data(c212.trial.data)
+c212.plot.eot.data(c212.trial.data)
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.plot.eot.data}
+\keyword{Bayesian} % __ONLY ONE__ keyword per line
+\keyword{Hierarchy} % __ONLY ONE__ keyword per line
+\keyword{Berry and Berry} % __ONLY ONE__ keyword per line
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d13 2
+a14 1
+	c212.plot.eot.data(trial.data, legend = TRUE, interactive = FALSE, cex = 0.5)
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d13 1
+a13 1
+	c212.plot.eot.data(trial.data, legend = TRUE, interactive = TRUE, cex = 0.5)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 2
+a2 2
+\name{c212.BB.plot.raw.data}
+\alias{c212.BB.plot.raw.data}
+d4 1
+a4 1
+\title{Plot Raw Adverse Event Incidence Data}
+d7 1
+a7 1
+adverse event. }
+d13 1
+a13 1
+	c212.BB.plot.raw.data(trial.data, legend = TRUE, interactive = TRUE, cex = 0.5)
+a42 40
+trial.data <- data.frame(B = c("BS6", "BS6", "BS7", "BS7", "BS6", "BS6",
+"BS5", "BS7", "BS6", "BS2", "BS2", "BS5", "BS4", "BS1", "BS6", "BS5",
+"BS4", "BS4", "BS2", "BS5", "BS1", "BS6", "BS8", "BS6", "BS3", "BS8",
+"BS8", "BS5", "BS6", "BS8", "BS5", "BS2", "BS6", "BS6", "BS3", "BS3",
+"BS8", "BS8", "BS6", "BS4", "BS5", "BS2", "BS3", "BS4", "BS5", "BS2",
+"BS3", "BS5", "BS6", "BS4", "BS8", "BS2", "BS6", "BS5", "BS5", "BS2",
+"BS3", "BS8", "BS6", "BS5", "BS8", "BS7", "BS3", "BS6", "BS4", "BS6",
+"BS6", "BS3", "BS4", "BS6", "BS3", "BS5", "BS5", "BS5", "BS6", "BS3",
+"BS6", "BS3", "BS7", "BS3", "BS3", "BS5", "BS8", "BS8", "BS4", "BS7",
+"BS6", "BS4", "BS3", "BS8"),
+AE = c("AE30", "AE33", "AE38", "AE39", "AE31", "AE31", "AE25", "AE37",
+"AE28", "AE3", "AE3", "AE24", "AE15", "AE1", "AE35", "AE18", "AE16",
+"AE17", "AE2", "AE23", "AE1", "AE35", "AE42", "AE27", "AE7", "AE43",
+"AE42", "AE24", "AE36", "AE40", "AE20", "AE4", "AE29", "AE27", "AE912",
+"AE910", "AE41", "AE45", "AE26", "AE16", "AE21", "AE5", "AE912", "AE14",
+"AE21", "AE5", "AE911", "AE23", "AE33", "AE14", "AE40", "AE4", "AE36",
+"AE22", "AE22", "AE2", "AE9", "AE45", "AE32", "AE25", "AE44", "AE39",
+"AE7", "AE34", "AE17", "AE34", "AE28", "AE6", "AE15", "AE29", "AE8",
+"AE19", "AE19", "AE20", "AE26", "AE8", "AE30", "AE910", "AE38", "AE6",
+"AE9", "AE18", "AE43", "AE44", "AE13", "AE37", "AE32", "AE13", "AE911",
+"AE41"),
+Group = c(2, 2, 2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2,
+1, 2, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 2, 1,
+2, 1, 2, 1, 2, 2, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2,
+1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2,
+1, 2, 2, 1, 2, 2, 1, 1, 1, 1),
+Count = c(20, 15, 25, 22, 24, 19, 49, 16, 12, 23, 18, 52, 19, 21, 18,
+51, 24, 22, 48, 57, 17, 20, 24, 20, 57, 20, 31, 56, 25, 19, 46, 25, 24,
+19, 22, 29, 20, 31, 28, 19, 66, 14, 60, 18, 51, 22, 52, 58, 22, 17, 12,
+14, 23, 57, 52, 28, 55, 18, 22, 52, 22, 24, 23, 27, 23, 26, 28, 22, 25,
+19, 23, 54, 54, 49, 22, 58, 21, 63, 22, 56, 23, 59, 25, 23, 27, 32, 13,
+20, 24, 23),
+Total = c(450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
+450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450))
+
+d44 2
+a45 1
+c212.BB.plot.raw.data(trial.data)
+d50 1
+a50 1
+\keyword{c212.BB.plot.raw.data}
+d53 1
+@

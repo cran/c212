@@ -1,0 +1,131 @@
+head	1.2;
+access;
+symbols
+	rel_0_90:1.2
+	rel_0_89:1.2
+	rel_0_88:1.2
+	rel_0_87:1.2
+	rel_0_86:1.2
+	rel_0_85:1.2
+	rel_0_84:1.2
+	rel_0_83:1.2
+	rel_0_82:1.2
+	rel_0_81:1.2
+	rel_0_80:1.2
+	rel_0_78:1.2
+	rel_0_77:1.2
+	rel_0_76:1.2
+	rel_0_75:1.2
+	rel_0_74:1.2
+	rel_0_73:1.2
+	rel_0_72:1.2
+	rel_0_51:1.2
+	rel_0_5:1.2
+	rel_0_4:1.2
+	rel_0_3:1.2
+	rel_0_2:1.2
+	rel_0_1:1.2;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2015.03.17.12.01.13;	author clb13102;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2015.02.23.16.36.40;	author clb13102;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@\name{c212.2FDR}
+\alias{c212.2FDR}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Implementation of a Two-Step False Discovery Rate for controlling the False Discovery Rate.}
+\description{
+Similar to the Double False Discovery Rate, the Two-Step method is designed to take advantage of possible groupings which may exist within 
+sets of hypotheses. A threshold (defaulting to the Benjamini-Hochberg cut-off) is used to identify sets of hypotheses
+which may contain significant hypotheses. It then groups these hypotheses together to form a single family and
+applies the BH-procedure to declare hypotheses significant. With the default threshold the procedure is at least as powerful as the Benjamini-Hochberg procedure.}
+\usage{
+%c212.2FDR <- function(trial.data, t_F = NULL, est = FALSE, alpha = 0.05)
+c212.2FDR(trial.data, t_F = NULL, alpha = 0.05)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{trial.data}{
+FIle or data frame containing the p-values for the hypotheses being tested. 
+The data must contain the following columns: \emph{B} - the index or name of the groupings and \emph{p} - the p-values of the hypotheses.
+}
+  \item{t_F}{
+Threshold value for determining if a group of hypotheses should be included in the final family. 
+}
+\item{alpha}{
+The level for FDR control. E.g. 0.05.
+}
+}
+\value{
+The subset of hypotheses in \emph{file} or \emph{trial.data} deemed significant by the Two-step False Discovery Rate process.
+}
+%\references{
+%}
+\author{
+R. Carragher
+}
+
+\examples{
+trial.data <- data.frame(B = c(1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4),
+j = c(1, 1, 2, 3, 4, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5),
+AE = c("AE1", "AE2", "AE3", "AE4", "AE5", "AE6", "AE7", "AE8", "AE9", "AE10", "AE11",
+"AE12", "AE13", "AE14", "AE15", "AE16", "AE17"),
+p = c(0.135005, 0.010000, 0.001000, 0.005000, 0.153501, 0.020000, 0.0013, 0.0023,
+0.011, 0.023000, 0.016, 0.0109, 0.559111, 0.751986, 0.308339, 0.837154, 0.325882))
+
+
+c212.2FDR(trial.data, t_F = NULL, alpha = 0.05)
+
+\dontrun{
+   B j   AE      p
+1  2 2  AE3 0.0010
+2  3 2  AE7 0.0013
+3  3 3  AE8 0.0023
+4  2 3  AE4 0.0050
+5  2 1  AE2 0.0100
+6  3 7 AE12 0.0109
+7  3 4  AE9 0.0110
+8  3 6 AE11 0.0160
+9  3 1  AE6 0.0200
+10 3 5 AE10 0.0230
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{c212.2FDR}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a19 3
+  \item{use_file}{
+Boolean. If TRUE read the hypotheses' data from \emph{file}, otherwise use the \emph{trial.data} data frame. 
+}
+d41 2
+a42 2
+p = c(0.135005, 0.010000, 0.001000, 0.005000, 0.153501, 0.020000, 0.0013, 0.0023, 0.011,
+0.023000, 0.016, 0.0109, 0.559111, 0.751986, 0.308339, 0.837154, 0.325882))
+@
