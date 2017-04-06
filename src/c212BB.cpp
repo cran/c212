@@ -1,5 +1,6 @@
 #include<cstdio>
 #include<cstdlib>
+#include<cmath>
 
 #include<map>
 
@@ -12,7 +13,9 @@
 #include "c2121a.h"
 #include "c212BB.h"
 
-static const char *rcsId = "$Id: c212BB.cpp,v 1.18 2017/01/06 10:26:20 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c212BB.cpp,v 1.19 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
 
 const char* c212BB::sColPMweight = "weight_pm";
 
@@ -859,7 +862,7 @@ double c212BB::log_f_alpha_pi(int c, double alpha)
 		 log_pi_sum += log(gPi[c][b]);
 	}
 
-	f = ((double)gNumBodySys) * (lgamma(alpha + beta_pi[c]) - lgamma(alpha)) + (alpha - 1.0) * log_pi_sum - alpha * lambda_alpha;
+	f = ((double)gNumBodySys) * (lgammafn(alpha + beta_pi[c]) - lgammafn(alpha)) + (alpha - 1.0) * log_pi_sum - alpha * lambda_alpha;
 
     return(f);
 }
@@ -1043,7 +1046,7 @@ double c212BB::log_f_beta_pi(int c, double beta)
     	log_sum += log(1.0 - gPi[c][b]);
 	}
 
-    f = ((double)gNumBodySys) * (lgamma(alpha_pi[c] + beta) - lgamma(beta)) + (beta - 1.0) * log_sum - beta * lambda_beta;
+    f = ((double)gNumBodySys) * (lgammafn(alpha_pi[c] + beta) - lgammafn(beta)) + (beta - 1.0) * log_sum - beta * lambda_beta;
 
     return(f);
 }

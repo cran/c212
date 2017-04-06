@@ -5,7 +5,7 @@ import(utils)
 import(graphics)
 
 # c212.BB
-useDynLib(c212)
+useDynLib(c212, .registration = TRUE)
 
 # c212.BBa
 export(c212.1a)

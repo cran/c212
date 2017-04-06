@@ -1,6 +1,7 @@
 #include<cstdio>
 #include<cstdlib>
 #include <cstring>
+#include <cmath>
 
 #include <R.h>
 #include <Rmath.h>
@@ -11,7 +12,9 @@
 #include "c2121a_poisson_mc_hier2_lev0.h"
 #include "c2121a_poisson_mc_hier3_lev0.h"
 
-static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev0.cpp,v 1.15 2016/08/25 15:13:14 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev0.cpp,v 1.16 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
 
 const char* c2121a_poisson_mc_hier3_lev0::sMonitor_mu_theta_0 = "mu.theta.0";
 const char* c2121a_poisson_mc_hier3_lev0::sMonitor_mu_gamma_0 = "mu.gamma.0";

@@ -2,6 +2,7 @@
 #include<cstdlib>
 
 #include <cstring>
+#include<cmath>
 
 #include <R.h>
 #include <Rmath.h>
@@ -13,7 +14,9 @@
 #include "c2121a_poisson_mc_hier2_lev0.h"
 #include "c212BB_poisson_mc_hier2_lev0.h"
 
-static const char *rcsId = "$Id: c212BB_poisson_mc_hier2_lev0.cpp,v 1.7 2016/08/25 15:13:14 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c212BB_poisson_mc_hier2_lev0.cpp,v 1.8 2017/03/22 16:12:09 clb13102 Exp clb13102 $";
 
 const char* c212BB_poisson_mc_hier2_lev0::sMonitor_pi = "pi";
 

@@ -28,6 +28,8 @@
 
 using namespace std;
 
+static const char *rcsId = "$Id: c212_exec.cpp,v 1.25 2017/03/24 17:04:06 clb13102 Exp clb13102 $";
+
 // These should really come from a common base class or be static within the class
 static c2121a* model = NULL;
 static c2121a_poisson_mc_hier2_lev0* model_interim = NULL;
@@ -1206,7 +1208,8 @@ SEXP getPiSamplesInterimAll()
 		samples = modelBB_h2->getPiSamples();
 	else {
 		modelBB_h3 = dynamic_cast<c212BB_poisson_mc_hier3_lev0 *>(model_interim);
-		samples = modelBB_h3->getPiSamples();
+		if (modelBB_h3)
+			samples = modelBB_h3->getPiSamples();
 	}
 
 	return samples;
@@ -1270,7 +1273,8 @@ void getPiSamplesInterim(int *c, int* l, int* b, double* pi)
 		modelBB_h2->getPiSamples(c, l, b, pi);
 	else {
 		modelBB_h3 = dynamic_cast<c212BB_poisson_mc_hier3_lev0 *>(model_interim);
-		modelBB_h3->getPiSamples(c, l, b, pi);
+		if (modelBB_h3)
+			modelBB_h3->getPiSamples(c, l, b, pi);
 	}
 }
 

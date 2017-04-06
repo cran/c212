@@ -1,6 +1,7 @@
 #include<cstdio>
 #include<cstdlib>
 #include <cstring>
+#include <cmath>
 
 #include <R.h>
 #include <Rmath.h>
@@ -14,7 +15,9 @@
 #include "c2121a_poisson_mc_hier3_lev2.h"
 #include "c2121a_poisson_mc_hier3_lev1.h"
 
-static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev1.cpp,v 1.10 2016/08/25 15:13:14 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev1.cpp,v 1.11 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
 
 //
 // The way the code is set up means we can't allow the body-systems to change from interval to

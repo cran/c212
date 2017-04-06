@@ -1,5 +1,6 @@
 #include<cstdio>
 #include<cstdlib>
+#include<cmath>
 
 #include <R.h>
 #include <Rmath.h>
@@ -10,7 +11,9 @@
 
 #include "c2121a.h"
 
-static const char *rcsId = "$Id: c2121a.cpp,v 1.17 2016/08/25 15:13:13 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c2121a.cpp,v 1.18 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
 
 const char* c2121a::sColType = "type";
 const char* c2121a::sColVariable = "variable";

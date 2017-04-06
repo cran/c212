@@ -2,6 +2,7 @@
 #include<cstdlib>
 
 #include<cstring>
+#include<cmath>
 
 #include <R.h>
 #include <Rmath.h>
@@ -16,7 +17,9 @@
 #include "c212BB_poisson_mc_hier3_lev2.h"
 #include "c212BB_poisson_mc_hier3_lev1.h"
 
-static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev1.cpp,v 1.12 2016/12/02 13:48:53 clb13102 Exp clb13102 $";
+using namespace std;
+
+static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev1.cpp,v 1.13 2017/03/22 16:12:09 clb13102 Exp clb13102 $";
 
 c212BB_poisson_mc_hier3_lev1::c212BB_poisson_mc_hier3_lev1()
 {
@@ -882,7 +885,7 @@ double c212BB_poisson_mc_hier3_lev1::log_f_alpha_pi(int c, double alpha)
 		log_pi_sum += log(gPi[c][b]);
 	}
 
-	f = f + ((double)gNumBodySys[0]) * (lgamma(alpha + beta_pi[c]) - lgamma(alpha));
+	f = f + ((double)gNumBodySys[0]) * (lgammafn(alpha + beta_pi[c]) - lgammafn(alpha));
 
 	f = f + (alpha - 1.0)*log_pi_sum;
 
@@ -1047,7 +1050,7 @@ double c212BB_poisson_mc_hier3_lev1::log_f_beta_pi(int c, double beta)
 		log_sum += log(1 - gPi[c][b]);
 	}
 
-	f = f + ((double)gNumBodySys[0]) * (lgamma(alpha_pi[c] + beta) - lgamma(beta));
+	f = f + ((double)gNumBodySys[0]) * (lgammafn(alpha_pi[c] + beta) - lgammafn(beta));
 
 	f = f + (beta - 1.0)*log_sum;
 
