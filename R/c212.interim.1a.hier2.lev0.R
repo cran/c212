@@ -6,7 +6,7 @@
 
 Mi_1a_h2_l0 <- new.env()
 
-Mi_1a_h2_l0$Id <- "$Id: c212.interim.1a.hier2.lev0.R,v 1.6 2016/08/25 15:13:41 clb13102 Exp clb13102 $"
+Mi_1a_h2_l0$Id <- "$Id: c212.interim.1a.hier2.lev0.R,v 1.7 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
 
 c212.interim.1a.hier2.lev0 <- function(trial.data, sim_type = "SLICE", burnin = 10000,
 		iter = 40000, nchains = 3,
@@ -77,8 +77,8 @@ c212.interim.1a.hier2.lev0 <- function(trial.data, sim_type = "SLICE", burnin = 
 					as.integer(t(Mi_1a_h2_l0$nAE)),
 					as.integer(aperm(Mi_1a_h2_l0$x)),
 					as.integer(aperm(Mi_1a_h2_l0$y)),
-					as.integer(aperm(Mi_1a_h2_l0$C)),
-					as.integer(aperm(Mi_1a_h2_l0$T)),
+					as.numeric(aperm(Mi_1a_h2_l0$C)),
+					as.numeric(aperm(Mi_1a_h2_l0$T)),
 					as.numeric(aperm(Mi_1a_h2_l0$theta)),
 					as.numeric(aperm(Mi_1a_h2_l0$gamma)),
 					as.numeric(Mi_1a_h2_l0$mu.gamma.0),
@@ -226,9 +226,9 @@ Mi_1a_h2_l0$initChains = function(c) {
 			Mi_1a_h2_l0$gamma[c, i, b, ][is.infinite(Mi_1a_h2_l0$gamma[c, i, b, ])] =
 										-10
 
-			Mi_1a_h2_l0$theta[1, i, b, ][is.nan(Mi_1a_h2_l0$theta[1, i, b, ])] =
+			Mi_1a_h2_l0$theta[c, i, b, ][is.nan(Mi_1a_h2_l0$theta[c, i, b, ])] =
 										-10 # -1000
-			Mi_1a_h2_l0$gamma[1, i, b, ][is.nan(Mi_1a_h2_l0$gamma[1, i, b, ])] =
+			Mi_1a_h2_l0$gamma[c, i, b, ][is.nan(Mi_1a_h2_l0$gamma[c, i, b, ])] =
 										-10 # -1000
 		}
 
@@ -255,7 +255,7 @@ Mi_1a_h2_l0$initialiseChains = function(initial_values, nchains) {
 				Mi_1a_h2_l0$gamma[1, i, b, ] <-
 									log(Mi_1a_h2_l0$x[i, b,]/Mi_1a_h2_l0$C[i, b, ])
 				Mi_1a_h2_l0$theta[1, i, b, ] <-
-								log(Mi_1a_h2_l0$y[i, b,]/Mi_1a_h2_l0$T[i]) -
+								log(Mi_1a_h2_l0$y[i, b,]/Mi_1a_h2_l0$T[i, b, ]) -
 								Mi_1a_h2_l0$gamma[1, i, b, ]
 
 				Mi_1a_h2_l0$theta[1, i, b, ][is.infinite(Mi_1a_h2_l0$theta[1, i, b, ])] = -10 # -1000

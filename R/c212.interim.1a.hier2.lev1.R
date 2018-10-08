@@ -6,7 +6,7 @@
 
 Mi_1a_h2_l1 <- new.env()
 
-Mi_1a_h2_l1$Id <- "$Id: c212.interim.1a.hier2.lev1.R,v 1.8 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Mi_1a_h2_l1$Id <- "$Id: c212.interim.1a.hier2.lev1.R,v 1.9 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
 
 c212.interim.1a.hier2.lev1 <- function(trial.data, sim_type = "SLICE", burnin = 10000,
 	iter = 40000, nchains = 3,
@@ -81,8 +81,8 @@ c212.interim.1a.hier2.lev1 <- function(trial.data, sim_type = "SLICE", burnin = 
 					as.integer(t(Mi_1a_h2_l1$nAE)),
 					as.integer(aperm(Mi_1a_h2_l1$x)),
 					as.integer(aperm(Mi_1a_h2_l1$y)),
-					as.integer(aperm(Mi_1a_h2_l1$C)),
-					as.integer(aperm(Mi_1a_h2_l1$T)),
+					as.numeric(aperm(Mi_1a_h2_l1$C)),
+					as.numeric(aperm(Mi_1a_h2_l1$T)),
 					as.numeric(aperm(Mi_1a_h2_l1$theta)),
 					as.numeric(aperm(Mi_1a_h2_l1$gamma)),
 					as.numeric(Mi_1a_h2_l1$mu.gamma.0),
@@ -221,8 +221,8 @@ Mi_1a_h2_l1$initChains = function(c) {
 			Mi_1a_h2_l1$theta[c, i, b, ][is.infinite(Mi_1a_h2_l1$theta[c, i, b, ])] = -10
 			Mi_1a_h2_l1$gamma[c, i, b, ][is.infinite(Mi_1a_h2_l1$gamma[c, i, b, ])] = -10
 
-			Mi_1a_h2_l1$theta[1, i, b, ][is.nan(Mi_1a_h2_l1$theta[1, i, b, ])] = -10 # -1000
-			Mi_1a_h2_l1$gamma[1, i, b, ][is.nan(Mi_1a_h2_l1$gamma[1, i, b, ])] = -10 # -1000
+			Mi_1a_h2_l1$theta[c, i, b, ][is.nan(Mi_1a_h2_l1$theta[c, i, b, ])] = -10 # -1000
+			Mi_1a_h2_l1$gamma[c, i, b, ][is.nan(Mi_1a_h2_l1$gamma[c, i, b, ])] = -10 # -1000
 		}
 	}
 
@@ -244,7 +244,7 @@ Mi_1a_h2_l1$initialiseChains = function(initial_values, nchains) {
 			numB = Mi_1a_h2_l1$numB[i]
 			for (b in 1:numB) {
 				Mi_1a_h2_l1$gamma[1, i, b, ] <- log(Mi_1a_h2_l1$x[i, b,]/Mi_1a_h2_l1$C[i, b, ])
-				Mi_1a_h2_l1$theta[1, i, b, ] <- log(Mi_1a_h2_l1$y[i, b,]/Mi_1a_h2_l1$T[i]) - Mi_1a_h2_l1$gamma[1, i, b, ]
+				Mi_1a_h2_l1$theta[1, i, b, ] <- log(Mi_1a_h2_l1$y[i, b,]/Mi_1a_h2_l1$T[i, b, ]) - Mi_1a_h2_l1$gamma[1, i, b, ]
 
 				Mi_1a_h2_l1$theta[1, i, b, ][is.infinite(Mi_1a_h2_l1$theta[1, i, b, ])] = -10 # -1000
 				Mi_1a_h2_l1$gamma[1, i, b, ][is.infinite(Mi_1a_h2_l1$gamma[1, i, b, ])] = -10 # -1000

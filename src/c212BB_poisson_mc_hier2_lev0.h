@@ -44,6 +44,7 @@ class c212BB_poisson_mc_hier2_lev0 : public c2121a_poisson_mc_hier2_lev0 {
 		virtual void sample_mu_theta(int burnin, int iter);
 		virtual void sample_sigma2_theta(int burnin, int iter);
 
+	public:
 		virtual void init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type,
 					SEXP sMem_Model,
 					SEXP sGlobal_Sim_Params,
@@ -63,11 +64,27 @@ class c212BB_poisson_mc_hier2_lev0 : public c2121a_poisson_mc_hier2_lev0 {
 					SEXP pPi, SEXP palpha_pi, SEXP pbeta_pi,
 					SEXP palgo, SEXP padapt_phase);
 
+	protected:
+		virtual void clear();
 		virtual void initGlobalSimParams(SEXP sim_type, SEXP sim_params);
 		virtual void initSimParams(SEXP sim_params);
 		virtual void initMonitor(SEXP sMonitor);
 
+		virtual void initL2Params(SEXP pmu_gamma_0,
+						SEXP ptau2_gamma_0, SEXP pmu_theta_0,
+						SEXP ptau2_theta_0, SEXP palpha_gamma,
+						SEXP pbeta_gamma, SEXP palpha_theta,
+						SEXP pbeta_theta, SEXP palpha_pi, SEXP pbeta_pi);
+
+		virtual void initL2Variables(SEXP pmu_gamma, SEXP pmu_theta,
+							SEXP psigma2_gamma, SEXP psigma2_theta, SEXP pPi);
+		virtual void releaseL2Variables();
+
+		virtual void initL2Samples();
+		virtual void releaseL2Samples();
+
 		virtual void initPMWeights(SEXP pm_weights);
+		virtual void releasePMWeights();
 
 	public:
 

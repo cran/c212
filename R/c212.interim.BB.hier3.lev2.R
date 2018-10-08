@@ -6,7 +6,7 @@
 
 Md1 <- new.env()
 
-Md1$Id <- "$Id: c212.interim.BB.hier3.lev2.R,v 1.16 2016/10/14 10:39:04 clb13102 Exp clb13102 $"
+Md1$Id <- "$Id: c212.interim.BB.hier3.lev2.R,v 1.17 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
 
 c212.interim.BB.dep.lev2 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 60000, nchains = 5,
 	theta_algorithm = "MH",
@@ -114,8 +114,8 @@ c212.interim.BB.dep.lev2 <- function(trial.data, sim_type = "SLICE", burnin = 10
 					as.integer(Md1$numIntervals), as.integer(Md1$Level),
 					Md1$maxBs, as.integer(Md1$numB), as.integer(Md1$maxAEs),
 					as.integer(t(Md1$nAE)), as.integer(aperm(Md1$x)), as.integer(aperm(Md1$y)),
-					as.integer(aperm(Md1$C)),
-					as.integer(aperm(Md1$T)),
+					as.numeric(aperm(Md1$C)),
+					as.numeric(aperm(Md1$T)),
 					as.numeric(aperm(Md1$theta)),
 					as.numeric(aperm(Md1$gamma)),
 					as.numeric(Md1$mu.gamma.0.0),
@@ -336,8 +336,8 @@ Md1$initChains = function(c) {
 			Md1$theta[c, i, b, ][is.infinite(Md1$theta[c, i, b, ])] = -10
 			Md1$gamma[c, i, b, ][is.infinite(Md1$gamma[c, i, b, ])] = -10
 
-			Md1$theta[1, i, b, ][is.nan(Md1$theta[1, i, b, ])] = -10 # -1000
-			Md1$gamma[1, i, b, ][is.nan(Md1$gamma[1, i, b, ])] = -10 # -1000
+			Md1$theta[c, i, b, ][is.nan(Md1$theta[c, i, b, ])] = -10 # -1000
+			Md1$gamma[c, i, b, ][is.nan(Md1$gamma[c, i, b, ])] = -10 # -1000
 		}
 
 		Md1$mu.gamma[c, i, 1:numB] = runif(numB, -10, 10)
@@ -369,7 +369,7 @@ Md1$initialiseChains = function(initial_values, nchains) {
 			numB = Md1$numB[i]
 			for (b in 1:numB) {
 				Md1$gamma[1, i, b, ] <- log(Md1$x[i, b,]/Md1$C[i, b, ])
-				Md1$theta[1, i, b, ] <- log(Md1$y[i, b,]/Md1$T[i]) - Md1$gamma[1, i, b, ]
+				Md1$theta[1, i, b, ] <- log(Md1$y[i, b,]/Md1$T[i, b, ]) - Md1$gamma[1, i, b, ]
 
 				Md1$theta[1, i, b, ][is.infinite(Md1$theta[1, i, b, ])] = -10 # -1000
 				Md1$gamma[1, i, b, ][is.infinite(Md1$gamma[1, i, b, ])] = -10 # -1000

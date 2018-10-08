@@ -6,7 +6,7 @@
 
 Md <- new.env()
 
-Md$Id <- "$Id: c212.interim.1a.hier3.lev2.R,v 1.8 2016/10/14 10:39:04 clb13102 Exp clb13102 $"
+Md$Id <- "$Id: c212.interim.1a.hier3.lev2.R,v 1.9 2018/10/03 15:40:55 clb13102 Exp clb13102 $"
 
 c212.interim.1a.dep.lev2 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 40000, nchains = 3,
 	global.sim.params = data.frame(type = c("MH", "SLICE"), param = c("sigma_MH", "w"), value = c(0.2,1),
@@ -77,8 +77,8 @@ c212.interim.1a.dep.lev2 <- function(trial.data, sim_type = "SLICE", burnin = 10
 					as.integer(Md$numIntervals), as.integer(Md$level),
 					Md$maxBs, as.integer(Md$numB), as.integer(Md$maxAEs),
 					as.integer(t(Md$nAE)), as.integer(aperm(Md$x)), as.integer(aperm(Md$y)),
-					as.integer(aperm(Md$C)),
-					as.integer(aperm(Md$T)),
+					as.numeric(aperm(Md$C)),
+					as.numeric(aperm(Md$T)),
 					as.numeric(aperm(Md$theta)),
 					as.numeric(aperm(Md$gamma)),
 					as.numeric(Md$mu.gamma.0.0),
@@ -254,8 +254,8 @@ Md$initChains = function(c) {
 			Md$theta[c, i, b, ][is.infinite(Md$theta[c, i, b, ])] = -10
 			Md$gamma[c, i, b, ][is.infinite(Md$gamma[c, i, b, ])] = -10
 
-			Md$theta[1, i, b, ][is.nan(Md$theta[1, i, b, ])] = -10 # -1000
-			Md$gamma[1, i, b, ][is.nan(Md$gamma[1, i, b, ])] = -10 # -1000
+			Md$theta[c, i, b, ][is.nan(Md$theta[c, i, b, ])] = -10 # -1000
+			Md$gamma[c, i, b, ][is.nan(Md$gamma[c, i, b, ])] = -10 # -1000
 		}
 
 		Md$mu.gamma[c, i, 1:numB] = runif(numB, -10, 10)
@@ -282,7 +282,7 @@ Md$initialiseChains = function(initial_values, nchains) {
 			numB = Md$numB[i]
 			for (b in 1:numB) {
 				Md$gamma[1, i, b, ] <- log(Md$x[i, b,]/Md$C[i, b, ])
-				Md$theta[1, i, b, ] <- log(Md$y[i, b,]/Md$T[i]) - Md$gamma[1, i, b, ]
+				Md$theta[1, i, b, ] <- log(Md$y[i, b,]/Md$T[i, b, ]) - Md$gamma[1, i, b, ]
 
 				Md$theta[1, i, b, ][is.infinite(Md$theta[1, i, b, ])] = -10 # -1000
 				Md$gamma[1, i, b, ][is.infinite(Md$gamma[1, i, b, ])] = -10 # -1000

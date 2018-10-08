@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c2121a_poisson_mc_hier2_lev0.cpp,v 1.6 2017/03/22 16:12:09 clb13102 Exp clb13102 $";
+static const char *rcsId = "$Id: c2121a_poisson_mc_hier2_lev0.cpp,v 1.7 2018/10/03 15:40:28 clb13102 Exp clb13102 $";
 
 const char* c2121a_poisson_mc_hier2_lev0::sColType = "type";
 const char* c2121a_poisson_mc_hier2_lev0::sColVariable = "variable";
@@ -207,303 +207,27 @@ void c2121a_poisson_mc_hier2_lev0::init(SEXP sChains, SEXP sBurnin, SEXP sIter, 
 					SEXP pmu_gamma,
 					SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta)
 {
-	release();
+	clear();
 
 	initMonitor(sMonitor);
 
-	int l = 0, b = 0, c = 0, a = 0;
+	initBaselineVariables(sChains, sBurnin, sIter,
+				sMem_Model, sNumIntervals, sMaxBs, sNumBodySys, sMaxAEs, sNAE);
 
-	gChains = *(INTEGER(sChains));
-	gBurnin = *(INTEGER(sBurnin));
-	gIter = *(INTEGER(sIter));
-	gNumIntervals = *(INTEGER(sNumIntervals));
-	gMaxBs = *(INTEGER(sMaxBs));
+	initDataVariables(pX, pY, pC, pT);
 
-	// Body-system Data
-	gNumBodySys = (int *)malloc(gNumIntervals * sizeof(int));
-	for (l = 0; l < gNumIntervals; l++) {
-		gNumBodySys[l] = (INTEGER(sNumBodySys))[l];
-	}
+	initL1Variables(ptheta, pgamma);
 
-	// AE data
-	gMaxAEs = *(INTEGER(sMaxAEs));
-	gNAE = (int **)malloc(gNumIntervals * sizeof(int *));
-	for (l = 0; l < gNumIntervals; l++) {
-		gNAE[l] = (int *)malloc(gMaxBs * sizeof(int));
-	}
+	initL2Params(pmu_gamma_0, ptau2_gamma_0, pmu_theta_0, ptau2_theta_0,
+						palpha_gamma, pbeta_gamma, palpha_theta, pbeta_theta);
 
-	int indx = 0;
-	for (l = 0; l < gNumIntervals; l++) {
-		for (b = 0; b < gMaxBs; b++) {
-			gNAE[l][b] = (INTEGER(sNAE))[indx++];
-		}
-	}
+	initL2Variables(pmu_gamma, pmu_theta, psigma2_gamma, psigma2_theta);
 
-	l = strlen(CHAR(STRING_ELT(sMem_Model, 0)));
-	char *mem_model = (char *)malloc((l + 1)*sizeof(char));
-	if (mem_model) {
-		strcpy(mem_model, CHAR(STRING_ELT(sMem_Model, 0)));
-		mem_model[l] = 0;
+	initL2Samples();
 
-		Rprintf("Memory Model: %s\n", mem_model);
+	initL1Samples();
 
-		if (0 == strcmp("LOW", mem_model)) {
-			eMemory_Model = LOW;
-		}
-		else {
-			eMemory_Model = HIGH;
-		}
-
-		free(mem_model);
-		mem_model = NULL;
-	}
-
-	x = (int***)malloc(gNumIntervals * sizeof(int**));
-	y = (int***)malloc(gNumIntervals * sizeof(int**));
-	C = (int***)malloc(gNumIntervals * sizeof(int**));
-	T = (int***)malloc(gNumIntervals * sizeof(int**));
-	for (l = 0; l < gNumIntervals; l++) {
-		x[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		y[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		C[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		T[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		for (b = 0; b < gMaxBs; b++) {
-			x[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			y[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			C[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			T[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-		}
-	}
-
-	int *vX = INTEGER(pX);
-	int *vY = INTEGER(pY);
-	int *vC = INTEGER(pC);
-	int *vT = INTEGER(pT);
-	for (l = 0; l < gNumIntervals; l++) {
-		int b = 0;
-		for (b = 0; b < gMaxBs; b++) {
-			for (a = 0; a < gMaxAEs; a++) {
-				x[l][b][a] = *vX;
-				y[l][b][a] = *vY;
-				C[l][b][a] = *vC;
-				T[l][b][a] = *vT;
-				vX++;
-				vY++;
-				vC++;
-				vT++;
-			}
-		}
-	}
-
-	gTheta = (double****)malloc(gChains * sizeof(double***));
-	gGamma = (double****)malloc(gChains * sizeof(double***));
-	for (c = 0; c < gChains; c++) {
-		gTheta[c] = (double***)malloc(gNumIntervals * sizeof(double**));
-		gGamma[c] = (double***)malloc(gNumIntervals * sizeof(double**));
-		for (l = 0; l < gNumIntervals; l++) {
-			gTheta[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
-			gGamma[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
-			for (b = 0; b < gMaxBs; b++) {
-				gTheta[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
-				gGamma[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
-			}
-		}
-	}
-
-	double* vtheta = REAL(ptheta);
-	double* vgamma = REAL(pgamma);
-	for (c = 0; c < gChains; c++) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				for (a = 0; a < gMaxAEs; a++) {
-					gTheta[c][l][b][a] = *vtheta;
-					gGamma[c][l][b][a] = *vgamma;
-					vtheta++;
-					vgamma++;
-				}
-			}
-		}
-	}
-
-	mu_gamma_0 = *(REAL(pmu_gamma_0));
-	tau2_gamma_0 = *(REAL(ptau2_gamma_0));
-	mu_theta_0 = *(REAL(pmu_theta_0));
-	tau2_theta_0 = *(REAL(ptau2_theta_0));
-	alpha_gamma = *(REAL(palpha_gamma));
-	beta_gamma = *(REAL(pbeta_gamma));
-	alpha_theta = *(REAL(palpha_theta));
-	beta_theta = *(REAL(pbeta_theta));
-
-	double* vmu_gamma = REAL(pmu_gamma);
-	mu_gamma = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		mu_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			mu_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				mu_gamma[c][l][b] = *vmu_gamma;
-				vmu_gamma++;
-			}
-		}
-	}
-
-	double* vmu_theta = REAL(pmu_theta);
-	mu_theta = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		mu_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			mu_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				mu_theta[c][l][b] = *vmu_theta;
-				vmu_theta++;
-			}
-		}
-	}
-
-	double* vsigma2_gamma = REAL(psigma2_gamma);
-	sigma2_gamma = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		sigma2_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			sigma2_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				sigma2_gamma[c][l][b] = *vsigma2_gamma;
-				vsigma2_gamma++;
-			}
-		}
-	}
-
-	double* vsigma2_theta = REAL(psigma2_theta);
-	sigma2_theta = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		sigma2_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			sigma2_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				sigma2_theta[c][l][b] = *vsigma2_theta;
-				vsigma2_theta++;
-			}
-		}
-	}
-
-	// The samples
-	if (retainSamples(iMonitor_mu_theta))
-		mu_theta_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_mu_gamma))
-		mu_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_sigma2_theta))
-		sigma2_theta_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_sigma2_gamma))
-		sigma2_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
-
-	for (c = 0; c < gChains; c++) {
-		if (retainSamples(iMonitor_mu_theta))
-			mu_theta_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_mu_gamma))
-			mu_gamma_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_sigma2_theta))
-			sigma2_theta_samples[c] =
-							(double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_sigma2_gamma))
-			sigma2_gamma_samples[c] =
-							(double ***)malloc(gNumIntervals *sizeof(double**));
-
-		for (l = 0; l < gNumIntervals; l++) {
-			if (retainSamples(iMonitor_mu_theta))
-				mu_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_mu_gamma))
-				mu_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_sigma2_theta))
-				sigma2_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_sigma2_gamma))
-				sigma2_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				if (retainSamples(iMonitor_mu_theta))
-					mu_theta_samples[c][l][b] =
-						(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_mu_gamma))
-					mu_gamma_samples[c][l][b] =
-						(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_sigma2_theta))
-					sigma2_theta_samples[c][l][b] =
-						(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_sigma2_gamma))
-					sigma2_gamma_samples[c][l][b] =
-						(double *)malloc((gIter - gBurnin)*sizeof(double));
-			}
-		}
-	}
-
-	if (retainSamples(iMonitor_theta))
-		gTheta_samples = (double *****)malloc(gChains*sizeof(double****));
-	if (retainSamples(iMonitor_gamma))
-		gGamma_samples = (double *****)malloc(gChains*sizeof(double****));
-
-	for (c = 0; c < gChains; c++) {
-		if (retainSamples(iMonitor_theta))
-			gTheta_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
-		if (retainSamples(iMonitor_gamma))
-			gGamma_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
-
-		for (l = 0; l < gNumIntervals; l++) {
-			if (retainSamples(iMonitor_theta))
-				gTheta_samples[c][l] =
-							(double ***)malloc(gNumBodySys[l] *sizeof(double**));
-			if (retainSamples(iMonitor_gamma))
-				gGamma_samples[c][l] =
-							(double ***)malloc(gNumBodySys[l] *sizeof(double**));
-
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				if (retainSamples(iMonitor_theta))
-					gTheta_samples[c][l][b] =
-								(double **)malloc(gNAE[l][b] *sizeof(double*));
-				if (retainSamples(iMonitor_gamma))
-					gGamma_samples[c][l][b] =
-								(double **)malloc(gNAE[l][b] *sizeof(double*));
-
-				for (a = 0; a < gNAE[l][b]; a++) {
-					if (retainSamples(iMonitor_theta))
-						gTheta_samples[c][l][b][a] =
-								(double *)malloc((gIter - gBurnin) *sizeof(double));
-					if (retainSamples(iMonitor_gamma))
-						gGamma_samples[c][l][b][a] =
-								(double *)malloc((gIter - gBurnin) *sizeof(double));
-				}
-			}
-		}
-	}
-
-	gTheta_acc = (int****)malloc(gChains * sizeof(int***));
-	gGamma_acc = (int****)malloc(gChains * sizeof(int***));
-	for (c = 0; c < gChains; c++) {
-		gTheta_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
-		gGamma_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
-		for (l = 0; l < gNumIntervals; l++) {
-			gTheta_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
-			gGamma_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
-			for (b = 0; b < gMaxBs; b++) {
-				gTheta_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-				gGamma_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-				for (a = 0; a < gMaxAEs; a++) {
-					gTheta_acc[c][l][b][a] = 0;
-					gGamma_acc[c][l][b][a] = 0;
-				}
-			}
-		}
-	}
-
-	// Simulations Parameters
-	l = strlen(CHAR(STRING_ELT(sSim_Type, 0)));
-	sim_type = (char *)malloc((l + 1)*sizeof(char));
-	if (sim_type) {
-		strcpy(sim_type, CHAR(STRING_ELT(sSim_Type, 0)));
-		sim_type[l] = 0;
-	}
-
-	// Global Simulation Parameters
-	gSim_Param = *REAL(sGlobal_Sim_Param);
-	gSim_Param_cntrl = *REAL(sGlobal_Sim_Param_cntrl);
+	initGlobalSimParams(sSim_Type, sGlobal_Sim_Param, sGlobal_Sim_Param_cntrl);
 
 	// Individual Simulation Parameters
 	initSimParams(sSim_Param);
@@ -654,6 +378,106 @@ void c2121a_poisson_mc_hier2_lev0::init(SEXP sChains, SEXP sBurnin, SEXP sIter, 
 	//Rprintf("beta.theta: %0.6f\n", beta_theta);
 }
 
+
+void c2121a_poisson_mc_hier2_lev0::initBaselineVariables(SEXP sChains, SEXP sBurnin, SEXP sIter,
+                    SEXP sMem_Model, SEXP sNumIntervals, SEXP sMaxBs, SEXP sNumBodySys, SEXP sMaxAEs, SEXP sNAE)
+{
+	int l = 0, b = 0;
+
+	gChains = *(INTEGER(sChains));
+	gBurnin = *(INTEGER(sBurnin));
+	gIter = *(INTEGER(sIter));
+	gNumIntervals = *(INTEGER(sNumIntervals));
+	gMaxBs = *(INTEGER(sMaxBs));
+
+	// Body-system Data
+	gNumBodySys = (int *)malloc(gNumIntervals * sizeof(int));
+	for (l = 0; l < gNumIntervals; l++) {
+		gNumBodySys[l] = (INTEGER(sNumBodySys))[l];
+	}
+
+	// AE data
+	gMaxAEs = *(INTEGER(sMaxAEs));
+	gNAE = (int **)malloc(gNumIntervals * sizeof(int *));
+	for (l = 0; l < gNumIntervals; l++) {
+		gNAE[l] = (int *)malloc(gMaxBs * sizeof(int));
+	}
+
+	int indx = 0;
+	for (l = 0; l < gNumIntervals; l++) {
+		for (b = 0; b < gMaxBs; b++) {
+			gNAE[l][b] = (INTEGER(sNAE))[indx++];
+		}
+	}
+
+	l = strlen(CHAR(STRING_ELT(sMem_Model, 0)));
+	char *mem_model = (char *)malloc((l + 1)*sizeof(char));
+	if (mem_model) {
+		strcpy(mem_model, CHAR(STRING_ELT(sMem_Model, 0)));
+		mem_model[l] = 0;
+
+		Rprintf("Memory Model: %s\n", mem_model);
+
+		if (0 == strcmp("LOW", mem_model)) {
+			eMemory_Model = LOW;
+		}
+		else {
+			eMemory_Model = HIGH;
+		}
+
+		free(mem_model);
+		mem_model = NULL;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::clear()
+{
+	release();
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseBaselineVariables()
+{
+	int l = 0;
+
+	if (gNumBodySys != NULL) {
+		free(gNumBodySys);
+		gNumBodySys = NULL;
+	}
+
+	if (gNAE != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			free(gNAE[l]);
+		}
+		free(gNAE);
+		gNAE = NULL;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initGlobalSimParams(SEXP sSim_Type, SEXP sGlobal_Sim_Param, SEXP sGlobal_Sim_Param_cntrl)
+{
+	int l = 0;
+
+	// Simulations Parameters
+	l = strlen(CHAR(STRING_ELT(sSim_Type, 0)));
+	sim_type = (char *)malloc((l + 1)*sizeof(char));
+	if (sim_type) {
+		strcpy(sim_type, CHAR(STRING_ELT(sSim_Type, 0)));
+		sim_type[l] = 0;
+	}
+
+	// Global Simulation Parameters
+	gSim_Param = *REAL(sGlobal_Sim_Param);
+	gSim_Param_cntrl = *REAL(sGlobal_Sim_Param_cntrl);
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseGlobalSimParams()
+{
+	if (sim_type != NULL) {
+		free(sim_type);
+		sim_type = NULL;
+	}
+}
+
 void c2121a_poisson_mc_hier2_lev0::initSimParams(SEXP sSim_Params)
 {
 	gW_gamma = (double ***)malloc(gNumIntervals * sizeof(double**));
@@ -772,6 +596,79 @@ void c2121a_poisson_mc_hier2_lev0::initSimParams(SEXP sSim_Params)
 	}
 }
 
+void c2121a_poisson_mc_hier2_lev0::releaseSimParams()
+{
+	int l = 0, b = 0;
+
+	if (gW_gamma != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gW_gamma[l][b]);
+			}
+			free(gW_gamma[l]);
+		}
+		free(gW_gamma);
+		gW_gamma = NULL;
+	}
+
+	if (gW_theta != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gW_theta[l][b]);
+			}
+			free(gW_theta[l]);
+		}
+		free(gW_theta);
+		gW_theta = NULL;
+	}
+
+	if (gW_gamma_control != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gW_gamma_control[l][b]);
+			}
+			free(gW_gamma_control[l]);
+		}
+		free(gW_gamma_control);
+		gW_gamma_control = NULL;
+	}
+
+	if (gW_theta_control != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gW_theta_control[l][b]);
+			}
+			free(gW_theta_control[l]);
+		}
+		free(gW_theta_control);
+		gW_theta_control = NULL;
+	}
+
+	if (gSigma_MH_gamma != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gSigma_MH_gamma[l][b]);
+			}
+			free(gSigma_MH_gamma[l]);
+		}
+		free(gSigma_MH_gamma);
+		gSigma_MH_gamma = NULL;
+	}
+
+	if (gSigma_MH_theta != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				free(gSigma_MH_theta[l][b]);
+			}
+			free(gSigma_MH_theta[l]);
+		}
+		free(gSigma_MH_theta);
+		gSigma_MH_theta = NULL;
+	}
+
+
+}
+
 void c2121a_poisson_mc_hier2_lev0::initMonitor(SEXP sMonitor)
 {
     int len = Rf_length(sMonitor);
@@ -822,6 +719,523 @@ void c2121a_poisson_mc_hier2_lev0::initMonitor(SEXP sMonitor)
 	            }
 			}
 		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initL2Params(SEXP pmu_gamma_0,
+						SEXP ptau2_gamma_0, SEXP pmu_theta_0,
+						SEXP ptau2_theta_0, SEXP palpha_gamma,
+						SEXP pbeta_gamma, SEXP palpha_theta,
+						SEXP pbeta_theta)
+{
+	mu_gamma_0 = *(REAL(pmu_gamma_0));
+	tau2_gamma_0 = *(REAL(ptau2_gamma_0));
+	mu_theta_0 = *(REAL(pmu_theta_0));
+	tau2_theta_0 = *(REAL(ptau2_theta_0));
+	alpha_gamma = *(REAL(palpha_gamma));
+	beta_gamma = *(REAL(pbeta_gamma));
+	alpha_theta = *(REAL(palpha_theta));
+	beta_theta = *(REAL(pbeta_theta));
+}
+
+void c2121a_poisson_mc_hier2_lev0::initL2Variables(SEXP pmu_gamma, SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta)
+{
+	int c = 0, l = 0, b = 0;
+
+	double* vmu_gamma = REAL(pmu_gamma);
+	mu_gamma = (double***)malloc(gChains * sizeof(double**));
+	for (c = 0; c < gChains; c++) {
+		mu_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
+		for (l = 0; l < gNumIntervals; l++) {
+			mu_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
+			for (b = 0; b < gMaxBs; b++) {
+				mu_gamma[c][l][b] = *vmu_gamma;
+				vmu_gamma++;
+			}
+		}
+	}
+
+	double* vmu_theta = REAL(pmu_theta);
+	mu_theta = (double***)malloc(gChains * sizeof(double**));
+	for (c = 0; c < gChains; c++) {
+		mu_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
+		for (l = 0; l < gNumIntervals; l++) {
+			mu_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
+			for (b = 0; b < gMaxBs; b++) {
+				mu_theta[c][l][b] = *vmu_theta;
+				vmu_theta++;
+			}
+		}
+	}
+
+	double* vsigma2_gamma = REAL(psigma2_gamma);
+	sigma2_gamma = (double***)malloc(gChains * sizeof(double**));
+	for (c = 0; c < gChains; c++) {
+		sigma2_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
+		for (l = 0; l < gNumIntervals; l++) {
+			sigma2_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
+			for (b = 0; b < gMaxBs; b++) {
+				sigma2_gamma[c][l][b] = *vsigma2_gamma;
+				vsigma2_gamma++;
+			}
+		}
+	}
+
+	double* vsigma2_theta = REAL(psigma2_theta);
+	sigma2_theta = (double***)malloc(gChains * sizeof(double**));
+	for (c = 0; c < gChains; c++) {
+		sigma2_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
+		for (l = 0; l < gNumIntervals; l++) {
+			sigma2_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
+			for (b = 0; b < gMaxBs; b++) {
+				sigma2_theta[c][l][b] = *vsigma2_theta;
+				vsigma2_theta++;
+			}
+		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseL2Variables()
+{
+	int c = 0, l = 0;
+
+	if (mu_gamma != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				free(mu_gamma[c][l]);
+			}
+			free(mu_gamma[c]);
+		}
+		free(mu_gamma);
+		mu_gamma = 0;
+	}
+
+	if (mu_theta != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				free(mu_theta[c][l]);
+			}
+			free(mu_theta[c]);
+		}
+		free(mu_theta);
+		mu_theta = 0;
+	}
+
+	if (sigma2_gamma != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				free(sigma2_gamma[c][l]);
+			}
+			free(sigma2_gamma[c]);
+		}
+		free(sigma2_gamma);
+		sigma2_gamma = 0;
+	}
+
+	if (sigma2_theta != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				free(sigma2_theta[c][l]);
+			}
+			free(sigma2_theta[c]);
+		}
+		free(sigma2_theta);
+		sigma2_theta = 0;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initL1Variables(SEXP ptheta, SEXP pgamma)
+{
+	int c = 0, l = 0, b = 0, a = 0;
+
+	gTheta = (double****)malloc(gChains * sizeof(double***));
+	gGamma = (double****)malloc(gChains * sizeof(double***));
+	for (c = 0; c < gChains; c++) {
+		gTheta[c] = (double***)malloc(gNumIntervals * sizeof(double**));
+		gGamma[c] = (double***)malloc(gNumIntervals * sizeof(double**));
+		for (l = 0; l < gNumIntervals; l++) {
+			gTheta[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
+			gGamma[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
+			for (b = 0; b < gMaxBs; b++) {
+				gTheta[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
+				gGamma[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
+			}
+		}
+	}
+
+	double* vtheta = REAL(ptheta);
+	double* vgamma = REAL(pgamma);
+	for (c = 0; c < gChains; c++) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gMaxBs; b++) {
+				for (a = 0; a < gMaxAEs; a++) {
+					gTheta[c][l][b][a] = *vtheta;
+					gGamma[c][l][b][a] = *vgamma;
+					vtheta++;
+					vgamma++;
+				}
+			}
+		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseL1Variables()
+{
+	int c = 0, l = 0, b = 0;
+
+	if (gTheta != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gMaxBs; b++) {
+					free(gTheta[c][l][b]);
+				}
+				free(gTheta[c][l]);
+			}
+			free(gTheta[c]);
+		}
+		free(gTheta);
+		gTheta = NULL;
+	}
+	if (gGamma != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gMaxBs; b++) {
+					free(gGamma[c][l][b]);
+				}
+				free(gGamma[c][l]);
+			}
+			free(gGamma[c]);
+		}
+		free(gGamma);
+		gGamma = NULL;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initDataVariables(SEXP pX, SEXP pY, SEXP pC, SEXP pT)
+{
+	int l = 0, b = 0, a = 0;
+
+	x = (int***)malloc(gNumIntervals * sizeof(int**));
+	y = (int***)malloc(gNumIntervals * sizeof(int**));
+	C = (double***)malloc(gNumIntervals * sizeof(double**));
+	T = (double***)malloc(gNumIntervals * sizeof(double**));
+	for (l = 0; l < gNumIntervals; l++) {
+		x[l] = (int**)malloc(gMaxBs * sizeof(int*));
+		y[l] = (int**)malloc(gMaxBs * sizeof(int*));
+		C[l] = (double**)malloc(gMaxBs * sizeof(double*));
+		T[l] = (double**)malloc(gMaxBs * sizeof(double*));
+		for (b = 0; b < gMaxBs; b++) {
+			x[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
+			y[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
+			C[l][b] = (double*)malloc(gMaxAEs * sizeof(double));
+			T[l][b] = (double*)malloc(gMaxAEs * sizeof(double));
+		}
+	}
+
+	int *vX = INTEGER(pX);
+	int *vY = INTEGER(pY);
+	double *vC = REAL(pC);
+	double *vT = REAL(pT);
+	for (l = 0; l < gNumIntervals; l++) {
+		int b = 0;
+		for (b = 0; b < gMaxBs; b++) {
+			for (a = 0; a < gMaxAEs; a++) {
+				x[l][b][a] = *vX;
+				y[l][b][a] = *vY;
+				C[l][b][a] = *vC;
+				T[l][b][a] = *vT;
+				vX++;
+				vY++;
+				vC++;
+				vT++;
+			}
+		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseDataVariables()
+{
+	int l = 0, b = 0;
+
+	if (x != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gMaxBs; b++) {
+				free(x[l][b]);
+			}
+			free(x[l]);
+		}
+		free(x);
+		x = NULL;
+	}
+	if (y != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gMaxBs; b++) {
+				free(y[l][b]);
+			}
+			free(y[l]);
+		}
+		free(y);
+		y = NULL;
+	}
+	if (C != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gMaxBs; b++) {
+				free(C[l][b]);
+			}
+			free(C[l]);
+		}
+		free(C);
+		C = NULL;
+	}
+	if (T != NULL) {
+		for (l = 0; l < gNumIntervals; l++) {
+			for (b = 0; b < gMaxBs; b++) {
+				free(T[l][b]);
+			}
+			free(T[l]);
+		}
+		free(T);
+		T = NULL;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initL2Samples()
+{
+	int c = 0, l = 0, b = 0;
+
+	// The samples
+	if (retainSamples(iMonitor_mu_theta))
+		mu_theta_samples = (double ****)malloc(gChains *sizeof(double***));
+	if (retainSamples(iMonitor_mu_gamma))
+		mu_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
+	if (retainSamples(iMonitor_sigma2_theta))
+		sigma2_theta_samples = (double ****)malloc(gChains *sizeof(double***));
+	if (retainSamples(iMonitor_sigma2_gamma))
+		sigma2_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
+
+	for (c = 0; c < gChains; c++) {
+		if (retainSamples(iMonitor_mu_theta))
+			mu_theta_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
+		if (retainSamples(iMonitor_mu_gamma))
+			mu_gamma_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
+		if (retainSamples(iMonitor_sigma2_theta))
+			sigma2_theta_samples[c] =
+							(double ***)malloc(gNumIntervals *sizeof(double**));
+		if (retainSamples(iMonitor_sigma2_gamma))
+			sigma2_gamma_samples[c] =
+							(double ***)malloc(gNumIntervals *sizeof(double**));
+
+		for (l = 0; l < gNumIntervals; l++) {
+			if (retainSamples(iMonitor_mu_theta))
+				mu_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
+			if (retainSamples(iMonitor_mu_gamma))
+				mu_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
+			if (retainSamples(iMonitor_sigma2_theta))
+				sigma2_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
+			if (retainSamples(iMonitor_sigma2_gamma))
+				sigma2_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
+
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				if (retainSamples(iMonitor_mu_theta))
+					mu_theta_samples[c][l][b] =
+						(double *)malloc((gIter - gBurnin)*sizeof(double));
+				if (retainSamples(iMonitor_mu_gamma))
+					mu_gamma_samples[c][l][b] =
+						(double *)malloc((gIter - gBurnin)*sizeof(double));
+				if (retainSamples(iMonitor_sigma2_theta))
+					sigma2_theta_samples[c][l][b] =
+						(double *)malloc((gIter - gBurnin)*sizeof(double));
+				if (retainSamples(iMonitor_sigma2_gamma))
+					sigma2_gamma_samples[c][l][b] =
+						(double *)malloc((gIter - gBurnin)*sizeof(double));
+			}
+		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseL2Samples()
+{
+	int c = 0, l = 0, b = 0;
+
+	if (mu_theta_samples) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					free(mu_theta_samples[c][l][b]);
+				}
+				free(mu_theta_samples[c][l]);
+			}
+			free(mu_theta_samples[c]);
+		}
+		free(mu_theta_samples);
+		mu_theta_samples = NULL;
+	}
+	if (mu_gamma_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					free(mu_gamma_samples[c][l][b]);
+				}
+				free(mu_gamma_samples[c][l]);
+			}
+			free(mu_gamma_samples[c]);
+		}
+		free(mu_gamma_samples);
+		mu_gamma_samples = NULL;
+	}
+	if (sigma2_theta_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					free(sigma2_theta_samples[c][l][b]);
+				}
+				free(sigma2_theta_samples[c][l]);
+			}
+			free(sigma2_theta_samples[c]);
+		}
+		free(sigma2_theta_samples);
+		sigma2_theta_samples = NULL;
+	}
+	if (sigma2_gamma_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					free(sigma2_gamma_samples[c][l][b]);
+				}
+				free(sigma2_gamma_samples[c][l]);
+			}
+			free(sigma2_gamma_samples[c]);
+		}
+		free(sigma2_gamma_samples);
+		sigma2_gamma_samples = NULL;
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::initL1Samples()
+{
+	int c = 0, l = 0, b = 0, a = 0;
+
+	if (retainSamples(iMonitor_theta))
+		gTheta_samples = (double *****)malloc(gChains*sizeof(double****));
+	if (retainSamples(iMonitor_gamma))
+		gGamma_samples = (double *****)malloc(gChains*sizeof(double****));
+
+	for (c = 0; c < gChains; c++) {
+		if (retainSamples(iMonitor_theta))
+			gTheta_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
+		if (retainSamples(iMonitor_gamma))
+			gGamma_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
+
+		for (l = 0; l < gNumIntervals; l++) {
+			if (retainSamples(iMonitor_theta))
+				gTheta_samples[c][l] =
+							(double ***)malloc(gNumBodySys[l] *sizeof(double**));
+			if (retainSamples(iMonitor_gamma))
+				gGamma_samples[c][l] =
+							(double ***)malloc(gNumBodySys[l] *sizeof(double**));
+
+			for (b = 0; b < gNumBodySys[l]; b++) {
+				if (retainSamples(iMonitor_theta))
+					gTheta_samples[c][l][b] =
+								(double **)malloc(gNAE[l][b] *sizeof(double*));
+				if (retainSamples(iMonitor_gamma))
+					gGamma_samples[c][l][b] =
+								(double **)malloc(gNAE[l][b] *sizeof(double*));
+
+				for (a = 0; a < gNAE[l][b]; a++) {
+					if (retainSamples(iMonitor_theta))
+						gTheta_samples[c][l][b][a] =
+								(double *)malloc((gIter - gBurnin) *sizeof(double));
+					if (retainSamples(iMonitor_gamma))
+						gGamma_samples[c][l][b][a] =
+								(double *)malloc((gIter - gBurnin) *sizeof(double));
+				}
+			}
+		}
+	}
+
+	gTheta_acc = (int****)malloc(gChains * sizeof(int***));
+	gGamma_acc = (int****)malloc(gChains * sizeof(int***));
+	for (c = 0; c < gChains; c++) {
+		gTheta_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
+		gGamma_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
+		for (l = 0; l < gNumIntervals; l++) {
+			gTheta_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
+			gGamma_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
+			for (b = 0; b < gMaxBs; b++) {
+				gTheta_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
+				gGamma_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
+				for (a = 0; a < gMaxAEs; a++) {
+					gTheta_acc[c][l][b][a] = 0;
+					gGamma_acc[c][l][b][a] = 0;
+				}
+			}
+		}
+	}
+}
+
+void c2121a_poisson_mc_hier2_lev0::releaseL1Samples()
+{
+	int c = 0, l = 0, b = 0, a = 0;
+
+	if (gTheta_samples) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					for (a = 0; a < gNAE[l][b]; a++) {
+						free(gTheta_samples[c][l][b][a]);
+					}
+					free(gTheta_samples[c][l][b]);
+				}
+				free(gTheta_samples[c][l]);
+			}
+			free(gTheta_samples[c]);
+		}
+		free(gTheta_samples);
+		gTheta_samples = NULL;
+	}
+	if (gGamma_samples) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gNumBodySys[l]; b++) {
+					for (a = 0; a < gNAE[l][b]; a++) {
+						free(gGamma_samples[c][l][b][a]);
+					}
+					free(gGamma_samples[c][l][b]);
+				}
+				free(gGamma_samples[c][l]);
+			}
+			free(gGamma_samples[c]);
+		}
+		free(gGamma_samples);
+		gGamma_samples = NULL;
+	}
+
+	if (gTheta_acc != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gMaxBs; b++) {
+					free(gTheta_acc[c][l][b]);
+				}
+				free(gTheta_acc[c][l]);
+			}
+			free(gTheta_acc[c]);
+		}
+		free(gTheta_acc);
+		gTheta_acc = NULL;
+	}
+	if (gGamma_acc != NULL) {
+		for (c = 0; c < gChains; c++) {
+			for (l = 0; l < gNumIntervals; l++) {
+				for (b = 0; b < gMaxBs; b++) {
+					free(gGamma_acc[c][l][b]);
+				}
+				free(gGamma_acc[c][l]);
+			}
+			free(gGamma_acc[c]);
+		}
+		free(gGamma_acc);
+		gGamma_acc = NULL;
 	}
 }
 
@@ -1335,7 +1749,7 @@ void c2121a_poisson_mc_hier2_lev0::sample_theta_SLICE(int burnin, int iter)
 					r = gTheta[c][i][b][j] + (gW_theta[i][b][j] - u);
 
 					while (J > 0) {
-						if (logy >= log_f_gamma(c, i, b, j, l)) {
+						if (logy >= log_f_theta(c, i, b, j, l)) {
 							break;
 						}
 						l = l - gW_theta[i][b][j];
@@ -1343,7 +1757,7 @@ void c2121a_poisson_mc_hier2_lev0::sample_theta_SLICE(int burnin, int iter)
 					}
 
 					while (K > 0) {
-						if (logy >= log_f_gamma(c, i, b, j, r)) {
+						if (logy >= log_f_theta(c, i, b, j, r)) {
 							break;
 						}
 						r = r + gW_theta[i][b][j];
@@ -1397,316 +1811,21 @@ double c2121a_poisson_mc_hier2_lev0::cMIN(double a, double b)
 
 void c2121a_poisson_mc_hier2_lev0::release()
 {
-	int c = 0, l = 0, b = 0, a = 0;
+	releaseGlobalSimParams();
 
-	if (sim_type != NULL) {
-		free(sim_type);
-		sim_type = NULL;
-	}
+	releaseDataVariables();
 
-	if (x != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				free(x[l][b]);
-			}
-			free(x[l]);
-		}
-		free(x);
-		x = NULL;
-	}
-	if (y != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				free(y[l][b]);
-			}
-			free(y[l]);
-		}
-		free(y);
-		y = NULL;
-	}
-	if (C != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				free(C[l][b]);
-			}
-			free(C[l]);
-		}
-		free(C);
-		C = NULL;
-	}
-	if (T != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				free(T[l][b]);
-			}
-			free(T[l]);
-		}
-		free(T);
-		T = NULL;
-	}
+	releaseL1Variables();
 
-	if (gTheta != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gMaxBs; b++) {
-					free(gTheta[c][l][b]);
-				}
-				free(gTheta[c][l]);
-			}
-			free(gTheta[c]);
-		}
-		free(gTheta);
-		gTheta = NULL;
-	}
-	if (gGamma != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gMaxBs; b++) {
-					free(gGamma[c][l][b]);
-				}
-				free(gGamma[c][l]);
-			}
-			free(gGamma[c]);
-		}
-		free(gGamma);
-		gGamma = NULL;
-	}
+	releaseL2Variables();
 
-	if (mu_gamma != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				free(mu_gamma[c][l]);
-			}
-			free(mu_gamma[c]);
-		}
-		free(mu_gamma);
-		mu_gamma = 0;
-	}
+	releaseL2Samples();
 
-	if (mu_theta != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				free(mu_theta[c][l]);
-			}
-			free(mu_theta[c]);
-		}
-		free(mu_theta);
-		mu_theta = 0;
-	}
+	releaseL1Samples();
 
-	if (sigma2_gamma != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				free(sigma2_gamma[c][l]);
-			}
-			free(sigma2_gamma[c]);
-		}
-		free(sigma2_gamma);
-		sigma2_gamma = 0;
-	}
+	releaseSimParams();
 
-	if (sigma2_theta != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				free(sigma2_theta[c][l]);
-			}
-			free(sigma2_theta[c]);
-		}
-		free(sigma2_theta);
-		sigma2_theta = 0;
-	}
-
-	if (mu_theta_samples) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					free(mu_theta_samples[c][l][b]);
-				}
-				free(mu_theta_samples[c][l]);
-			}
-			free(mu_theta_samples[c]);
-		}
-		free(mu_theta_samples);
-		mu_theta_samples = NULL;
-	}
-	if (mu_gamma_samples != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					free(mu_gamma_samples[c][l][b]);
-				}
-				free(mu_gamma_samples[c][l]);
-			}
-			free(mu_gamma_samples[c]);
-		}
-		free(mu_gamma_samples);
-		mu_gamma_samples = NULL;
-	}
-	if (sigma2_theta_samples != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					free(sigma2_theta_samples[c][l][b]);
-				}
-				free(sigma2_theta_samples[c][l]);
-			}
-			free(sigma2_theta_samples[c]);
-		}
-		free(sigma2_theta_samples);
-		sigma2_theta_samples = NULL;
-	}
-	if (sigma2_gamma_samples != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					free(sigma2_gamma_samples[c][l][b]);
-				}
-				free(sigma2_gamma_samples[c][l]);
-			}
-			free(sigma2_gamma_samples[c]);
-		}
-		free(sigma2_gamma_samples);
-		sigma2_gamma_samples = NULL;
-	}
-
-	if (gTheta_samples) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					for (a = 0; a < gNAE[l][b]; a++) {
-						free(gTheta_samples[c][l][b][a]);
-					}
-					free(gTheta_samples[c][l][b]);
-				}
-				free(gTheta_samples[c][l]);
-			}
-			free(gTheta_samples[c]);
-		}
-		free(gTheta_samples);
-		gTheta_samples = NULL;
-	}
-	if (gGamma_samples) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gNumBodySys[l]; b++) {
-					for (a = 0; a < gNAE[l][b]; a++) {
-						free(gGamma_samples[c][l][b][a]);
-					}
-					free(gGamma_samples[c][l][b]);
-				}
-				free(gGamma_samples[c][l]);
-			}
-			free(gGamma_samples[c]);
-		}
-		free(gGamma_samples);
-		gGamma_samples = NULL;
-	}
-
-	if (gTheta_acc != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gMaxBs; b++) {
-					free(gTheta_acc[c][l][b]);
-				}
-				free(gTheta_acc[c][l]);
-			}
-			free(gTheta_acc[c]);
-		}
-		free(gTheta_acc);
-		gTheta_acc = NULL;
-	}
-	if (gGamma_acc != NULL) {
-		for (c = 0; c < gChains; c++) {
-			for (l = 0; l < gNumIntervals; l++) {
-				for (b = 0; b < gMaxBs; b++) {
-					free(gGamma_acc[c][l][b]);
-				}
-				free(gGamma_acc[c][l]);
-			}
-			free(gGamma_acc[c]);
-		}
-		free(gGamma_acc);
-		gGamma_acc = NULL;
-	}
-
-	if (gW_gamma != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gW_gamma[l][b]);
-			}
-			free(gW_gamma[l]);
-		}
-		free(gW_gamma);
-		gW_gamma = NULL;
-	}
-
-	if (gW_theta != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gW_theta[l][b]);
-			}
-			free(gW_theta[l]);
-		}
-		free(gW_theta);
-		gW_theta = NULL;
-	}
-
-	if (gW_gamma_control != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gW_gamma_control[l][b]);
-			}
-			free(gW_gamma_control[l]);
-		}
-		free(gW_gamma_control);
-		gW_gamma_control = NULL;
-	}
-
-	if (gW_theta_control != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gW_theta_control[l][b]);
-			}
-			free(gW_theta_control[l]);
-		}
-		free(gW_theta_control);
-		gW_theta_control = NULL;
-	}
-
-	if (gSigma_MH_gamma != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gSigma_MH_gamma[l][b]);
-			}
-			free(gSigma_MH_gamma[l]);
-		}
-		free(gSigma_MH_gamma);
-		gSigma_MH_gamma = NULL;
-	}
-
-	if (gSigma_MH_theta != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				free(gSigma_MH_theta[l][b]);
-			}
-			free(gSigma_MH_theta[l]);
-		}
-		free(gSigma_MH_theta);
-		gSigma_MH_theta = NULL;
-	}
-
-	if (gNumBodySys != NULL) {
-		free(gNumBodySys);
-		gNumBodySys = NULL;
-	}
-
-	if (gNAE != NULL) {
-		for (l = 0; l < gNumIntervals; l++) {
-			free(gNAE[l]);
-		}
-		free(gNAE);
-		gNAE = NULL;
-	}
+	releaseBaselineVariables();
 }
 
 SEXP c2121a_poisson_mc_hier2_lev0::getL1Samples(double***** &data)

@@ -28,7 +28,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c212_exec.cpp,v 1.25 2017/03/24 17:04:06 clb13102 Exp clb13102 $";
+static const char *rcsId = "$Id: c212_exec.cpp,v 1.26 2018/09/21 10:30:19 clb13102 Exp clb13102 $";
 
 // These should really come from a common base class or be static within the class
 static c2121a* model = NULL;
@@ -64,7 +64,7 @@ SEXP c2121a_exec(SEXP pChains, SEXP pBurnin, SEXP pIter, SEXP pNumBodySys,
 {
 	try {
 
-		if (!model) {
+		if (model) {
 			delete model;
 			model = NULL;
 		}
@@ -378,7 +378,7 @@ SEXP c212BB_exec(SEXP sChains, SEXP sBurnin, SEXP sIter,  SEXP sNumBodySys,
 
 	try {
 
-		if (!model) {
+		if (model) {
 			delete model;
 			model = NULL;
 		}
@@ -546,7 +546,7 @@ SEXP c2121a_interim_hier2_exec(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim
 {
 	try {
 
-		if (!model_interim) {
+		if (model_interim) {
 			delete model_interim;
 			model_interim = NULL;
 		}
@@ -640,9 +640,9 @@ SEXP c2121a_poisson_mc_exec(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Ty
 {
 	try {
 
-		if (!model_interim) {
+		if (model_interim) {
 			delete model_interim;
-			model = NULL;
+			model_interim = NULL;
 		}
 
 		int level = *(INTEGER(sLevel));
@@ -989,7 +989,7 @@ SEXP c212BB_poisson_mc_exec(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Ty
 {
 	try {
 
-		if (!model_interim) {
+		if (model_interim) {
 			delete model_interim;
 			model_interim = NULL;
 		}
@@ -1119,7 +1119,7 @@ SEXP c212BB_interim_hier2_exec(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim
 {
 	try {
 
-		if (!model_interim) {
+		if (model_interim) {
 			delete model_interim;
 			model_interim = NULL;
 		}

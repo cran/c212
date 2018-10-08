@@ -18,7 +18,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev2.cpp,v 1.16 2017/03/22 16:12:09 clb13102 Exp clb13102 $";
+static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev2.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
 
 c212BB_poisson_mc_hier3_lev2::c212BB_poisson_mc_hier3_lev2()
 {
@@ -88,159 +88,127 @@ c212BB_poisson_mc_hier3_lev2::c212BB_poisson_mc_hier3_lev2(SEXP sChains, SEXP sB
 				palgo, padapt_phase);
 }
 
-void c212BB_poisson_mc_hier3_lev2::init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type, SEXP sMem_Model, SEXP sGlobal_Sim_Params,
-					SEXP sSim_Params,
-					SEXP MH_weight,
-					SEXP pm_weights,
-					SEXP sMonitor,
-					SEXP sNumIntervals,
-					SEXP sMaxBs, SEXP sNumBodySys, SEXP sMaxAEs, SEXP sNAE,
-					SEXP pX, SEXP pY, SEXP pC, SEXP pT, SEXP ptheta, SEXP pgamma,
-					SEXP pmu_gamma_0_0,
-					SEXP ptau2_gamma_0_0, SEXP pmu_theta_0_0, SEXP ptau2_theta_0_0, SEXP palpha_gamma_0_0,
-					SEXP pbeta_gamma_0_0, SEXP palpha_theta_0_0, SEXP pbeta_theta_0_0, SEXP palpha_gamma,
-					SEXP pbeta_gamma, SEXP palpha_theta, SEXP pbeta_theta, SEXP pmu_gamma_0,
-					SEXP ptau2_gamma_0, SEXP pmu_theta_0, SEXP ptau2_theta_0, SEXP pmu_gamma,
-					SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta,
-					SEXP pPi, SEXP palpha_pi, SEXP pbeta_pi, SEXP plambda_alpha, SEXP plambda_beta,
-					SEXP palgo, SEXP padapt_phase)
-
+void c212BB_poisson_mc_hier3_lev2::clear()
 {
 	release();
 	c212BB_poisson_mc_hier3_lev0::release();
 	c2121a_poisson_mc_hier3_lev0::release();
 	c2121a_poisson_mc_hier2_lev0::release();
+}
 
-	initMonitor(sMonitor);
+void c212BB_poisson_mc_hier3_lev2::initL3Samples()
+{
+	int c = 0;
 
-	int l = 0, b = 0, c = 0, a = 0;
+	// The samples
+	if (retainSamples(iMonitor_mu_gamma_0))
+		mu_gamma_0_samples = (double **)malloc(gChains * sizeof(double*));
+	if (retainSamples(iMonitor_mu_theta_0))
+		mu_theta_0_samples = (double **)malloc(gChains * sizeof(double*));
+	if (retainSamples(iMonitor_tau2_gamma_0))
+		tau2_gamma_0_samples = (double **)malloc(gChains * sizeof(double*));
+	if (retainSamples(iMonitor_tau2_theta_0))
+		tau2_theta_0_samples = (double **)malloc(gChains * sizeof(double*));
+	if (retainSamples(iMonitor_alpha_pi))
+		alpha_pi_samples = (double **)malloc(gChains * sizeof(double*));
+	if (retainSamples(iMonitor_beta_pi))
+		beta_pi_samples = (double **)malloc(gChains * sizeof(double*));
 
-	gChains = *(INTEGER(sChains));
-	gBurnin = *(INTEGER(sBurnin));
-	gIter = *(INTEGER(sIter));
-	gNumIntervals = *(INTEGER(sNumIntervals));
-	gMaxBs = *(INTEGER(sMaxBs));
-
-	// Body-system Data
-	gNumBodySys = (int *)malloc(gNumIntervals * sizeof(int));
-	for (l = 0; l < gNumIntervals; l++) {
-		gNumBodySys[l] = (INTEGER(sNumBodySys))[l];
-	}
-
-	// AE data
-	gMaxAEs = *(INTEGER(sMaxAEs));
-	gNAE = (int **)malloc(gNumIntervals * sizeof(int *));
-	for (l = 0; l < gNumIntervals; l++) {
-		gNAE[l] = (int *)malloc(gMaxBs * sizeof(int));
-	}
-
-	int indx = 0;
-	for (l = 0; l < gNumIntervals; l++) {
-		for (b = 0; b < gMaxBs; b++) {
-			gNAE[l][b] = (INTEGER(sNAE))[indx++];
-		}
-	}
-
-	l = strlen(CHAR(STRING_ELT(sMem_Model, 0)));
-	char *mem_model = (char *)malloc((l + 1)*sizeof(char));
-	if (mem_model) {
-		strcpy(mem_model, CHAR(STRING_ELT(sMem_Model, 0)));
-		mem_model[l] = 0;
-
-		Rprintf("Memory Model: %s\n", mem_model);
-
-		if (0 == strcmp("LOW", mem_model)) {
-			eMemory_Model = LOW;
-		}
-		else {
-			eMemory_Model = HIGH;
-		}
-
-		free(mem_model);
-		mem_model = NULL;
-	}
-
-	x = (int***)malloc(gNumIntervals * sizeof(int**));
-	y = (int***)malloc(gNumIntervals * sizeof(int**));
-	C = (int***)malloc(gNumIntervals * sizeof(int**));
-	T = (int***)malloc(gNumIntervals * sizeof(int**));
-	for (l = 0; l < gNumIntervals; l++) {
-		x[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		y[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		C[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		T[l] = (int**)malloc(gMaxBs * sizeof(int*));
-		for (b = 0; b < gMaxBs; b++) {
-			x[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			y[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			C[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-			T[l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-		}
-	}
-
-	int *vX = INTEGER(pX);
-	int *vY = INTEGER(pY);
-	int *vC = INTEGER(pC);
-	int *vT = INTEGER(pT);
-	for (l = 0; l < gNumIntervals; l++) {
-		int b = 0;
-		for (b = 0; b < gMaxBs; b++) {
-			for (a = 0; a < gMaxAEs; a++) {
-				x[l][b][a] = *vX;
-				y[l][b][a] = *vY;
-				C[l][b][a] = *vC;
-				T[l][b][a] = *vT;
-				vX++;
-				vY++;
-				vC++;
-				vT++;
-			}
-		}
-	}
-
-	gTheta = (double****)malloc(gChains * sizeof(double***));
-	gGamma = (double****)malloc(gChains * sizeof(double***));
 	for (c = 0; c < gChains; c++) {
-		gTheta[c] = (double***)malloc(gNumIntervals * sizeof(double**));
-		gGamma[c] = (double***)malloc(gNumIntervals * sizeof(double**));
-		for (l = 0; l < gNumIntervals; l++) {
-			gTheta[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
-			gGamma[c][l] = (double**)malloc(gMaxBs * sizeof(double*));
-			for (b = 0; b < gMaxBs; b++) {
-				gTheta[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
-				gGamma[c][l][b] = (double*)malloc(gMaxAEs * sizeof(double));
-			}
-		}
+		if (retainSamples(iMonitor_mu_gamma_0))
+			mu_gamma_0_samples[c] = (double *)malloc((gIter - gBurnin)* sizeof(double));
+		if (retainSamples(iMonitor_mu_theta_0))
+			mu_theta_0_samples[c] = (double *)malloc((gIter - gBurnin)* sizeof(double));
+		if (retainSamples(iMonitor_tau2_gamma_0))
+			tau2_gamma_0_samples[c] =
+									(double *)malloc((gIter - gBurnin)* sizeof(double));
+		if (retainSamples(iMonitor_tau2_theta_0))
+			tau2_theta_0_samples[c] =
+									(double *)malloc((gIter - gBurnin)* sizeof(double));
+		if (retainSamples(iMonitor_alpha_pi))
+			alpha_pi_samples[c] =
+									(double *)malloc((gIter - gBurnin)* sizeof(double));
+		if (retainSamples(iMonitor_beta_pi))
+			beta_pi_samples[c] =
+									(double *)malloc((gIter - gBurnin)* sizeof(double));
 	}
 
-	double* vtheta = REAL(ptheta);
-	double* vgamma = REAL(pgamma);
+	alpha_pi_acc = (int*)malloc(gChains * sizeof(int));
+	beta_pi_acc = (int*)malloc(gChains * sizeof(int));
 	for (c = 0; c < gChains; c++) {
-		for (l = 0; l < gNumIntervals; l++) {
-			for (b = 0; b < gMaxBs; b++) {
-				for (a = 0; a < gMaxAEs; a++) {
-					gTheta[c][l][b][a] = *vtheta;
-					gGamma[c][l][b][a] = *vgamma;
-					vtheta++;
-					vgamma++;
-				}
-			}
-		}
+		alpha_pi_acc[c] = 0;
+		beta_pi_acc[c] = 0;
+	}
+}
+
+void c212BB_poisson_mc_hier3_lev2::releaseL3Samples()
+{
+	int c = 0;
+
+	if (alpha_pi_acc != NULL) {
+		free(alpha_pi_acc);
+		alpha_pi_acc = NULL;
 	}
 
-	mu_gamma_0_0 = *(REAL(pmu_gamma_0_0));
-	tau2_gamma_0_0 = *(REAL(ptau2_gamma_0_0));
-	mu_theta_0_0 = *(REAL(pmu_theta_0_0));
-	tau2_theta_0_0 = *(REAL(ptau2_theta_0_0));
-	alpha_gamma_0_0 = *(REAL(palpha_gamma_0_0));
-	beta_gamma_0_0 = *(REAL(pbeta_gamma_0_0));
-	alpha_theta_0_0 = *(REAL(palpha_theta_0_0));
-	beta_theta_0_0 = *(REAL(pbeta_theta_0_0));
-	alpha_gamma = *(REAL(palpha_gamma));
-	beta_gamma = *(REAL(pbeta_gamma));
-	alpha_theta = *(REAL(palpha_theta));
-	beta_theta = *(REAL(pbeta_theta));
-	lambda_alpha = *(REAL(plambda_alpha));
-	lambda_beta = *(REAL(plambda_beta));
+	if (beta_pi_acc != NULL) {
+		free(beta_pi_acc);
+		beta_pi_acc = NULL;
+	}
+
+	if (alpha_pi_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(alpha_pi_samples[c]);
+		}
+		free(alpha_pi_samples);
+		alpha_pi_samples = NULL;
+	}
+
+	if (beta_pi_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(beta_pi_samples[c]);
+		}
+		free(beta_pi_samples);
+		beta_pi_samples = NULL;
+	}
+
+	if (mu_gamma_0_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(mu_gamma_0_samples[c]);
+		}
+		free(mu_gamma_0_samples);
+		mu_gamma_0_samples = NULL;
+	}
+
+	if (mu_theta_0_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(mu_theta_0_samples[c]);
+		}
+		free(mu_theta_0_samples);
+		mu_theta_0_samples = NULL;
+	}
+
+	if (tau2_gamma_0_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(tau2_gamma_0_samples[c]);
+		}
+		free(tau2_gamma_0_samples);
+		tau2_gamma_0_samples = NULL;
+	}
+
+	if (tau2_theta_0_samples != NULL) {
+		for (c = 0; c < gChains; c++) {
+			free(tau2_theta_0_samples[c]);
+		}
+		free(tau2_theta_0_samples);
+		tau2_theta_0_samples = NULL;
+	}
+}
+
+void c212BB_poisson_mc_hier3_lev2::initL3Variables(SEXP pmu_gamma_0, SEXP ptau2_gamma_0,
+					SEXP pmu_theta_0, SEXP ptau2_theta_0,
+					SEXP palpha_pi, SEXP pbeta_pi)
+{
+	int c = 0;
 
 	mu_gamma_0 = (double*)malloc(gChains * sizeof(double));
 	double *vmu_gamma_0 = REAL(pmu_gamma_0);
@@ -283,381 +251,39 @@ void c212BB_poisson_mc_hier3_lev2::init(SEXP sChains, SEXP sBurnin, SEXP sIter, 
 		beta_pi[c] = *vbeta_pi;
 		vbeta_pi++;
 	}
+}
 
-	double* vmu_gamma = REAL(pmu_gamma);
-	mu_gamma = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		mu_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			mu_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				mu_gamma[c][l][b] = *vmu_gamma;
-				vmu_gamma++;
-			}
-		}
+void c212BB_poisson_mc_hier3_lev2::releaseL3Variables()
+{
+	if (mu_theta_0 != NULL) {
+		free(mu_theta_0);
+		mu_theta_0 = NULL;
 	}
 
-	double* vmu_theta = REAL(pmu_theta);
-	mu_theta = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		mu_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			mu_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				mu_theta[c][l][b] = *vmu_theta;
-				vmu_theta++;
-			}
-		}
+	if (mu_gamma_0 != NULL) {
+		free(mu_gamma_0);
+		mu_gamma_0 = NULL;
 	}
 
-	double* vsigma2_gamma = REAL(psigma2_gamma);
-	sigma2_gamma = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		sigma2_gamma[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			sigma2_gamma[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				sigma2_gamma[c][l][b] = *vsigma2_gamma;
-				vsigma2_gamma++;
-			}
-		}
+	if (tau2_theta_0 != NULL) {
+		free(tau2_theta_0);
+		tau2_theta_0 = NULL;
 	}
 
-	double* vsigma2_theta = REAL(psigma2_theta);
-	sigma2_theta = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		sigma2_theta[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			sigma2_theta[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				sigma2_theta[c][l][b] = *vsigma2_theta;
-				vsigma2_theta++;
-			}
-		}
+	if (tau2_gamma_0 != NULL) {
+		free(tau2_gamma_0);
+		tau2_gamma_0 = NULL;
 	}
 
-	double* vpi = REAL(pPi);
-	gPi = (double***)malloc(gChains * sizeof(double**));
-	for (c = 0; c < gChains; c++) {
-		gPi[c] = (double**)malloc(gNumIntervals * sizeof(double*));
-		for (l = 0; l < gNumIntervals; l++) {
-			gPi[c][l] = (double*)malloc(gMaxBs * sizeof(double));
-			for (b = 0; b < gMaxBs; b++) {
-				gPi[c][l][b] = *vpi;
-				vpi++;
-			}
-		}
+	if (alpha_pi != NULL) {
+		free(alpha_pi);
+		alpha_pi = NULL;
 	}
 
-	// The samples
-	if (retainSamples(iMonitor_mu_gamma_0))
-		mu_gamma_0_samples = (double **)malloc(gChains * sizeof(double*));
-	if (retainSamples(iMonitor_mu_theta_0))
-		mu_theta_0_samples = (double **)malloc(gChains * sizeof(double*));
-	if (retainSamples(iMonitor_tau2_gamma_0))
-		tau2_gamma_0_samples = (double **)malloc(gChains * sizeof(double*));
-	if (retainSamples(iMonitor_tau2_theta_0))
-		tau2_theta_0_samples = (double **)malloc(gChains * sizeof(double*));
-	if (retainSamples(iMonitor_alpha_pi))
-		alpha_pi_samples = (double **)malloc(gChains * sizeof(double*));
-	if (retainSamples(iMonitor_beta_pi))
-		beta_pi_samples = (double **)malloc(gChains * sizeof(double*));
-
-	for (c = 0; c < gChains; c++) {
-		if (retainSamples(iMonitor_mu_gamma_0))
-			mu_gamma_0_samples[c] = (double *)malloc((gIter - gBurnin)* sizeof(double));
-		if (retainSamples(iMonitor_mu_theta_0))
-			mu_theta_0_samples[c] = (double *)malloc((gIter - gBurnin)* sizeof(double));
-		if (retainSamples(iMonitor_tau2_gamma_0))
-			tau2_gamma_0_samples[c] =
-									(double *)malloc((gIter - gBurnin)* sizeof(double));
-		if (retainSamples(iMonitor_tau2_theta_0))
-			tau2_theta_0_samples[c] =
-									(double *)malloc((gIter - gBurnin)* sizeof(double));
-		if (retainSamples(iMonitor_alpha_pi))
-			alpha_pi_samples[c] =
-									(double *)malloc((gIter - gBurnin)* sizeof(double));
-		if (retainSamples(iMonitor_beta_pi))
-			beta_pi_samples[c] =
-									(double *)malloc((gIter - gBurnin)* sizeof(double));
+	if (beta_pi != NULL) {
+		free(beta_pi);
+		beta_pi = NULL;
 	}
-
-	if (retainSamples(iMonitor_mu_theta))
-		mu_theta_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_mu_gamma))
-		mu_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_sigma2_theta))
-		sigma2_theta_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_sigma2_gamma))
-		sigma2_gamma_samples = (double ****)malloc(gChains *sizeof(double***));
-	if (retainSamples(iMonitor_pi))
-		gPi_samples = (double ****)malloc(gChains *sizeof(double***));
-
-	for (c = 0; c < gChains; c++) {
-		if (retainSamples(iMonitor_mu_theta))
-			mu_theta_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_mu_gamma))
-			mu_gamma_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_sigma2_theta))
-			sigma2_theta_samples[c] =
-								(double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_sigma2_gamma))
-			sigma2_gamma_samples[c] =
-								(double ***)malloc(gNumIntervals *sizeof(double**));
-		if (retainSamples(iMonitor_pi))
-			gPi_samples[c] = (double ***)malloc(gNumIntervals *sizeof(double**));
-
-		for (l = 0; l < gNumIntervals; l++) {
-			if (retainSamples(iMonitor_mu_theta))
-				mu_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_mu_gamma))
-				mu_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_sigma2_theta))
-				sigma2_theta_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_sigma2_gamma))
-				sigma2_gamma_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-			if (retainSamples(iMonitor_pi))
-				gPi_samples[c][l] = (double **)malloc(gMaxBs *sizeof(double*));
-
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				if (retainSamples(iMonitor_mu_theta))
-					mu_theta_samples[c][l][b] =
-									(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_mu_gamma))
-					mu_gamma_samples[c][l][b] =
-									(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_sigma2_theta))
-				sigma2_theta_samples[c][l][b] =
-									(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_sigma2_gamma))
-					sigma2_gamma_samples[c][l][b] =
-									(double *)malloc((gIter - gBurnin)*sizeof(double));
-				if (retainSamples(iMonitor_pi))
-					gPi_samples[c][l][b] =
-									(double *)malloc((gIter - gBurnin)*sizeof(double));
-			}
-		}
-	}
-
-	if (retainSamples(iMonitor_theta))
-		gTheta_samples = (double *****)malloc(gChains*sizeof(double****));
-	if (retainSamples(iMonitor_gamma))
-		gGamma_samples = (double *****)malloc(gChains*sizeof(double****));
-
-	for (c = 0; c < gChains; c++) {
-		if (retainSamples(iMonitor_theta))
-			gTheta_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
-		if (retainSamples(iMonitor_gamma))
-			gGamma_samples[c] = (double ****)malloc(gNumIntervals *sizeof(double***));
-
-		for (l = 0; l < gNumIntervals; l++) {
-			if (retainSamples(iMonitor_theta))
-				gTheta_samples[c][l] =
-								(double ***)malloc(gNumBodySys[l] *sizeof(double**));
-			if (retainSamples(iMonitor_gamma))
-				gGamma_samples[c][l] =
-								(double ***)malloc(gNumBodySys[l] *sizeof(double**));
-
-			for (b = 0; b < gNumBodySys[l]; b++) {
-				if (retainSamples(iMonitor_theta))
-					gTheta_samples[c][l][b] =
-									(double **)malloc(gNAE[l][b] *sizeof(double*));
-				if (retainSamples(iMonitor_gamma))
-					gGamma_samples[c][l][b] =
-									(double **)malloc(gNAE[l][b] *sizeof(double*));
-
-				for (a = 0; a < gNAE[l][b]; a++) {
-					if (retainSamples(iMonitor_theta))
-						gTheta_samples[c][l][b][a] =
-									(double *)malloc((gIter - gBurnin) *sizeof(double));
-					if (retainSamples(iMonitor_gamma))
-						gGamma_samples[c][l][b][a] =
-									(double *)malloc((gIter - gBurnin) *sizeof(double));
-				}
-			}
-		}
-	}
-
-	gTheta_acc = (int****)malloc(gChains * sizeof(int***));
-	gGamma_acc = (int****)malloc(gChains * sizeof(int***));
-	for (c = 0; c < gChains; c++) {
-		gTheta_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
-		gGamma_acc[c] = (int***)malloc(gNumIntervals * sizeof(int**));
-		for (l = 0; l < gNumIntervals; l++) {
-			gTheta_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
-			gGamma_acc[c][l] = (int**)malloc(gMaxBs * sizeof(int*));
-			for (b = 0; b < gMaxBs; b++) {
-				gTheta_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-				gGamma_acc[c][l][b] = (int*)malloc(gMaxAEs * sizeof(int));
-				for (a = 0; a < gMaxAEs; a++) {
-					gTheta_acc[c][l][b][a] = 0;
-					gGamma_acc[c][l][b][a] = 0;
-				}
-			}
-		}
-	}
-
-	alpha_pi_acc = (int*)malloc(gChains * sizeof(int));
-	beta_pi_acc = (int*)malloc(gChains * sizeof(int));
-	for (c = 0; c < gChains; c++) {
-		alpha_pi_acc[c] = 0;
-		beta_pi_acc[c] = 0;
-	}
-
-	// Global simulation parameters
-	initGlobalSimParams(sSim_Type, sGlobal_Sim_Params);
-
-	// Individual simulation parameters
-	initSimParams(sSim_Params);
-
-	// MH point-mass weights
-	gMH_weight = *(REAL(MH_weight));
-	initPMWeights(pm_weights);
-
-	//Rprintf("Simultion Data: %s (%0.6f) %d, %d, %d\n",
-	//							sim_type, gSim_Param, gChains, gBurnin, gIter);
-	//
-	//Rprintf("Intervals: %d\n", gNumIntervals);
-	//for (l = 0; l < gNumIntervals; l++)
-	//	Rprintf("\tInterval %d: Contains %d body-systems\n", l, gNumBodySys[l]);
-	//
- 	//Rprintf("\tMaxBs: %d\n", gMaxBs);
- 	//Rprintf("\tMaxAEs: %d\n", gMaxAEs);
-	//
-	//for (l = 0; l < gNumIntervals; l++) {
-	//	for (b = 0; b < gMaxBs; b++) {
-	//		Rprintf("\tAEs in Interval: %d, BS: %d = %d\n", l, b, gNAE[l][b]);
-	//	}
-	//}
-	//
-	//Rprintf("Control Count Data:\n");
-	//for (l = 0; l < gNumIntervals; l++) {
-	//	Rprintf("\tInterval: %d\n", l);
-	//	int b = 0;
-	//	for (b = 0; b < gNumBodySys[l]; b++) {
-	//		Rprintf("\t\tBody-system: %d\n", b);
-	//		int a = 0;
-	//		for (a = 0; a < gNAE[l][b]; a++) {
-	//			Rprintf("\t\t\tAE: %d - Count: %d\n", a, x[l][b][a]);
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("Treatment Count Data:\n");
-	//for (l = 0; l < gNumIntervals; l++) {
-	//	Rprintf("\tInterval: %d\n", l);
-	//	for (b = 0; b < gNumBodySys[l]; b++) {
-	//		Rprintf("\t\tBody-system: %d\n", b);
-	//		int a = 0;
-	//		for (a = 0; a < gNAE[l][b]; a++) {
-	//			Rprintf("\tAE: %d - Count: %d\n", a, y[l][b][a]);
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("Control Exposure Data:\n");
-	//for (l = 0; l < gNumIntervals; l++) {
-	//	Rprintf("\tInterval: %d\n", l);
-	//	for (b = 0; b < gNumBodySys[l]; b++) {
-	//		Rprintf("\t\tBody-system: %d\n", b);
-	//		int a = 0;
-	//		for (a = 0; a < gNAE[l][b]; a++) {
-	//			Rprintf("\t\t\tAE: %d - Count: %d\n", a, C[l][b][a]);
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("Treatment Exposure Data:\n");
-	//for (l = 0; l < gNumIntervals; l++) {
-	//	Rprintf("\tInterval: %d\n", l);
-	//	for (b = 0; b < gNumBodySys[l]; b++) {
-	//		Rprintf("\t\tBody-system: %d\n", b);
-	//		int a = 0;
-	//		for (a = 0; a < gNAE[l][b]; a++) {
-	//			Rprintf("\t\t\tAE: %d - Count: %d\n", a, T[l][b][a]);
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("Theta initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	Rprintf("\tChain: %d\n", c);
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\tInterval: %d\n", l);
-	//		for (b = 0; b < gNumBodySys[l]; b++) {
-	//			Rprintf("\t\tBody-system: %d\n", b);
-	//			int a = 0;
-	//			for (a = 0; a < gNAE[l][b]; a++) {
-	//				Rprintf("\t\t\t\t: %0.6f\n", gTheta[c][l][b][a]);
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("Gamma initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	Rprintf("\tChain: %d\n", c);
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\tInterval: %d\n", l);
-	//		for (b = 0; b < gNumBodySys[l]; b++) {
-	//			Rprintf("\t\tBody-system: %d\n", b);
-	//			int a = 0;
-	//			for (a = 0; a < gNAE[l][b]; a++) {
-	//				Rprintf("\t\t\t\t: %0.6f\n", gGamma[c][l][b][a]);
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("mu.gamma.0 initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\t%0.6f\n", mu_gamma_0[c][l]);
-	//	}
-	//}
-	//
-	//Rprintf("mu.theta.0 initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\t%0.6f\n", mu_theta_0[c][l]);
-	//	}
-	//}
-	//
-	//Rprintf("tau2.gamma.0 initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\t%0.6f\n", tau2_gamma_0[c][l]);
-	//	}
-	//}
-	//
-	//Rprintf("tau2.theta.0 initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		Rprintf("\t%0.6f\n", tau2_theta_0[c][l]);
-	//	}
-	//}
-	//
-	//Rprintf("sigma2_gamma initialised values:\n");
-	//for (c = 0; c < gChains; c++) {
-	//	for (l = 0; l < gNumIntervals; l++) {
-	//		for (b = 0; b < gNumBodySys[l]; b++) {
-	//			Rprintf("\t%d %d %d: %0.6f\n", c, l , b, sigma2_gamma[c][l][b]);
-	//		}
-	//	}
-	//}
-	//
-	//Rprintf("mu.gamma.0.0: %0.6f\n", mu_gamma_0_0);
-	//Rprintf("tau2.gamma.0.0: %0.6f\n", tau2_gamma_0_0);
-	//Rprintf("mu.theta.0.0: %0.6f\n", mu_theta_0_0);
-	//Rprintf("tau2.theta.0.0: %0.6f\n", tau2_theta_0_0);
-	//Rprintf("alpha.gamma.0.0: %0.6f\n", alpha_gamma_0_0);
-	//Rprintf("beta.gamma.0.0: %0.6f\n", beta_gamma_0_0);
-	//Rprintf("alpha.theta.0.0: %0.6f\n", alpha_theta_0_0);
-	//Rprintf("beta.theta.0.0: %0.6f\n", beta_theta_0_0);
-	//Rprintf("alpha.gamma: %0.6f\n", alpha_gamma);
-	//Rprintf("beta.gamma: %0.6f\n", beta_gamma);
-	//Rprintf("alpha.theta: %0.6f\n", alpha_theta);
-	//Rprintf("beta.theta: %0.6f\n", beta_theta);
 }
 
 c212BB_poisson_mc_hier3_lev2::~c212BB_poisson_mc_hier3_lev2()
@@ -1105,7 +731,7 @@ double c212BB_poisson_mc_hier3_lev2::log_f_beta_pi(int c, double beta)
 
 void c212BB_poisson_mc_hier3_lev2::sample_beta_pi_MH(int burnin, int iter)
 {
-	int c = 0, l = 0;
+	int c = 0;
 
 	for (c = 0; c < gChains; c++) {
 
@@ -1115,7 +741,7 @@ void c212BB_poisson_mc_hier3_lev2::sample_beta_pi_MH(int burnin, int iter)
 #ifdef INDIVIDUAL_RNG
 			GetRNGstate();
 #endif
-			cand = rnorm(beta_pi[l], gDefault_Sigma_MH_beta);
+			cand = rnorm(beta_pi[c], gDefault_Sigma_MH_beta);
 #ifdef INDIVIDUAL_RNG
 			PutRNGstate();
 #endif
@@ -1479,63 +1105,9 @@ double c212BB_poisson_mc_hier3_lev2::cMIN(double a, double b)
 
 void c212BB_poisson_mc_hier3_lev2::release()
 {
-	int c = 0;
+	releaseL3Variables();
 
-	if (alpha_pi != NULL) {
-		free(alpha_pi);
-		alpha_pi = NULL;
-	}
-
-	if (alpha_pi_acc != NULL) {
-		free(alpha_pi_acc);
-		alpha_pi_acc = NULL;
-	}
-
-	if (beta_pi != NULL) {
-		free(beta_pi);
-		beta_pi = NULL;
-	}
-
-	if (beta_pi_acc != NULL) {
-		free(beta_pi_acc);
-		beta_pi_acc = NULL;
-	}
-
-	if (alpha_pi_samples != NULL) {
-		for (c = 0; c < gChains; c++) {
-			free(alpha_pi_samples[c]);
-		}
-		free(alpha_pi_samples);
-		alpha_pi_samples = NULL;
-	}
-
-	if (beta_pi_samples != NULL) {
-		for (c = 0; c < gChains; c++) {
-			free(beta_pi_samples[c]);
-		}
-		free(beta_pi_samples);
-		beta_pi_samples = NULL;
-	}
-
-	if (mu_theta_0 != NULL) {
-		free(mu_theta_0);
-		mu_theta_0 = NULL;
-	}
-
-	if (mu_gamma_0 != NULL) {
-		free(mu_gamma_0);
-		mu_gamma_0 = NULL;
-	}
-
-	if (tau2_theta_0 != NULL) {
-		free(tau2_theta_0);
-		tau2_theta_0 = NULL;
-	}
-
-	if (tau2_gamma_0 != NULL) {
-		free(tau2_gamma_0);
-		tau2_gamma_0 = NULL;
-	}
+	releaseL3Samples();
 }
 
 SEXP c212BB_poisson_mc_hier3_lev2::getL3Samples(double** &data)

@@ -53,6 +53,7 @@ class c212BB_poisson_mc_hier3_lev0 : public c2121a_poisson_mc_hier3_lev0 {
 		virtual void sample_theta_MH(int burnin, int iter);
 		double cMIN(double a, double b);
 
+	public:
 		virtual void init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type,
 					SEXP sMem_Model,
 					SEXP sGlobal_Sim_Params,
@@ -76,13 +77,38 @@ class c212BB_poisson_mc_hier3_lev0 : public c2121a_poisson_mc_hier3_lev0 {
 					SEXP plambda_beta,
 					SEXP palgo, SEXP padapt_phase);
 
+	protected:
+		virtual void clear();
+
 		virtual void initGlobalSimParams(SEXP sim_type, SEXP sim_params);
 
 		virtual void initSimParams(SEXP sim_params);
 
 		virtual void initPMWeights(SEXP pm_weights);
+		virtual void releasePMWeights();
 
 		virtual void initMonitor(SEXP sMonitor);
+
+		virtual void initL3Params(SEXP pmu_gamma_0_0, SEXP ptau2_gamma_0_0,
+					SEXP pmu_theta_0_0, SEXP ptau2_theta_0_0,
+					SEXP palpha_gamma_0_0, SEXP pbeta_gamma_0_0,
+					SEXP palpha_theta_0_0, SEXP pbeta_theta_0_0,
+					SEXP palpha_gamma, SEXP pbeta_gamma,
+					SEXP palpha_theta, SEXP pbeta_theta,
+					SEXP plambda_alpha, SEXP plambda_beta);
+
+		virtual void initL3Variables(SEXP pmu_gamma_0, SEXP ptau2_gamma_0,
+					SEXP pmu_theta_0, SEXP ptau2_theta_0,
+					SEXP palpha_pi, SEXP pbeta_pi);
+		virtual void releaseL3Variables();
+
+		virtual void initL3Samples();
+		virtual void releaseL3Samples();
+
+		virtual void initL2Variables(SEXP pmu_gamma, SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta, SEXP pPi);
+		virtual void releaseL2Variables();
+		virtual void initL2Samples();
+		virtual void releaseL2Samples();
 
 		virtual SEXP getL3Accept(int** &data);
 

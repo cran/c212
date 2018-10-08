@@ -49,24 +49,14 @@ class c212BB_poisson_mc_hier2_lev1 : public c212BB_poisson_mc_hier2_lev0 {
 		virtual void sample_theta_MH(int burnin, int iter);
 		double cMIN(double a, double b);
 
-		virtual void init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type,
-					SEXP sMem_Model,
-					SEXP sGlobal_Sim_Params,
-					SEXP sSim_Params,
-					SEXP MH_weight,
-					SEXP pm_weights,
-					SEXP sMonitor,
-					SEXP sNumIntervals,
-					SEXP sMaxBs, SEXP sNumBodySys, SEXP sMaxAEs, SEXP sNAE,
-					SEXP pX, SEXP pY, SEXP pC, SEXP pT, SEXP ptheta, SEXP pgamma,
-					SEXP palpha_gamma,
-					SEXP pbeta_gamma, SEXP palpha_theta, SEXP pbeta_theta,
-					SEXP pmu_gamma_0,
-					SEXP ptau2_gamma_0, SEXP pmu_theta_0, SEXP ptau2_theta_0,
-					SEXP pmu_gamma,
-					SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta,
-					SEXP pPi, SEXP palpha_pi, SEXP pbeta_pi,
-					SEXP palgo, SEXP padapt_phase);
+		virtual void clear();
+
+		virtual void initL2Variables(SEXP pmu_gamma, SEXP pmu_theta,
+							SEXP psigma2_gamma, SEXP psigma2_theta, SEXP pPi);
+		virtual void releaseL2Variables();
+
+		virtual void initL2Samples();
+		virtual void releaseL2Samples();
 
 		virtual SEXP getL2Samples(double*** &data);
 

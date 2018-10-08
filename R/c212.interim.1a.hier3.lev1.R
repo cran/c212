@@ -6,7 +6,7 @@
 
 Md1a_lev1 <- new.env()
 
-Md1a_lev1$Id <- "$Id: c212.interim.1a.hier3.lev1.R,v 1.11 2016/10/14 10:39:04 clb13102 Exp clb13102 $"
+Md1a_lev1$Id <- "$Id: c212.interim.1a.hier3.lev1.R,v 1.12 2018/10/03 15:40:55 clb13102 Exp clb13102 $"
 
 c212.interim.1a.dep.lev1 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 40000, nchains = 3,
 	global.sim.params = data.frame(type = c("MH", "SLICE"), param = c("sigma_MH", "w"), value = c(0.2,1),
@@ -81,8 +81,8 @@ c212.interim.1a.dep.lev1 <- function(trial.data, sim_type = "SLICE", burnin = 10
 					as.integer(Md1a_lev1$numIntervals), as.integer(Md1a_lev1$level),
 					Md1a_lev1$maxBs, as.integer(Md1a_lev1$numB), as.integer(Md1a_lev1$maxAEs),
 					as.integer(t(Md1a_lev1$nAE)), as.integer(aperm(Md1a_lev1$x)), as.integer(aperm(Md1a_lev1$y)),
-					as.integer(aperm(Md1a_lev1$C)),
-					as.integer(aperm(Md1a_lev1$T)),
+					as.numeric(aperm(Md1a_lev1$C)),
+					as.numeric(aperm(Md1a_lev1$T)),
 					as.numeric(aperm(Md1a_lev1$theta)),
 					as.numeric(aperm(Md1a_lev1$gamma)),
 					as.numeric(Md1a_lev1$mu.gamma.0.0),
@@ -258,17 +258,16 @@ Md1a_lev1$initChains = function(c) {
 			Md1a_lev1$theta[c, i, b, ][is.infinite(Md1a_lev1$theta[c, i, b, ])] = -10
 			Md1a_lev1$gamma[c, i, b, ][is.infinite(Md1a_lev1$gamma[c, i, b, ])] = -10
 
-			Md1a_lev1$theta[1, i, b, ][is.nan(Md1a_lev1$theta[1, i, b, ])] = -10 # -1000
-			Md1a_lev1$gamma[1, i, b, ][is.nan(Md1a_lev1$gamma[1, i, b, ])] = -10 # -1000
+			Md1a_lev1$theta[c, i, b, ][is.nan(Md1a_lev1$theta[c, i, b, ])] = -10 # -1000
+			Md1a_lev1$gamma[c, i, b, ][is.nan(Md1a_lev1$gamma[c, i, b, ])] = -10 # -1000
 		}
 
-
-
-		Md1a_lev1$mu.gamma.0[c] = runif(1, -10, 10)
-		Md1a_lev1$tau2.gamma.0[c] = runif(1, 5, 20)
-		Md1a_lev1$mu.theta.0[c] = runif(1, -10, 10)
-		Md1a_lev1$tau2.theta.0[c] = runif(1, 5, 20)
 	}
+
+	Md1a_lev1$mu.gamma.0[c] = runif(1, -10, 10)
+	Md1a_lev1$tau2.gamma.0[c] = runif(1, 5, 20)
+	Md1a_lev1$mu.theta.0[c] = runif(1, -10, 10)
+	Md1a_lev1$tau2.theta.0[c] = runif(1, 5, 20)
 
 	Md1a_lev1$mu.theta[c, 1:numB] = runif(numB, -10, 10)
 	Md1a_lev1$mu.gamma[c, 1:numB] = runif(numB, -10, 10)
@@ -288,7 +287,7 @@ Md1a_lev1$initialiseChains = function(initial_values, nchains) {
 			numB = Md1a_lev1$numB[i]
 			for (b in 1:numB) {
 				Md1a_lev1$gamma[1, i, b, ] <- log(Md1a_lev1$x[i, b,]/Md1a_lev1$C[i, b, ])
-				Md1a_lev1$theta[1, i, b, ] <- log(Md1a_lev1$y[i, b,]/Md1a_lev1$T[i]) - Md1a_lev1$gamma[1, i, b, ]
+				Md1a_lev1$theta[1, i, b, ] <- log(Md1a_lev1$y[i, b,]/Md1a_lev1$T[i, b, ]) - Md1a_lev1$gamma[1, i, b, ]
 
 				Md1a_lev1$theta[1, i, b, ][is.infinite(Md1a_lev1$theta[1, i, b, ])] = -10 # -1000
 				Md1a_lev1$gamma[1, i, b, ][is.infinite(Md1a_lev1$gamma[1, i, b, ])] = -10 # -1000

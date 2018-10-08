@@ -32,6 +32,7 @@ class c2121a_poisson_mc_hier2_lev0 {
 
 	protected:
 		virtual void release();
+		virtual void clear();
 		virtual void simulate_MH();
 		virtual void simulate_SLICE();
 
@@ -47,6 +48,7 @@ class c2121a_poisson_mc_hier2_lev0 {
 		virtual void sample_theta_SLICE(int burnin, int iter);
 		double cMIN(double a, double b);
 
+	public:
 		virtual void init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type,
 					SEXP sMem_Model,
 					SEXP sGlobal_Sim_Param,
@@ -63,9 +65,41 @@ class c2121a_poisson_mc_hier2_lev0 {
 					SEXP pmu_gamma,
 					SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta);
 
+	protected:
+		virtual void initBaselineVariables(SEXP sChains, SEXP sBurnin, SEXP sIter,
+                    SEXP sMem_Model, SEXP sNumIntervals, SEXP sMaxBs,
+					SEXP sNumBodySys, SEXP sMaxAEs, SEXP sNAE);
+		virtual void releaseBaselineVariables();
+
 		virtual void initSimParams(SEXP sim_params);
+		virtual void releaseSimParams();
+
+		virtual void initGlobalSimParams(SEXP sSim_Type, SEXP sGlobal_Sim_Param, SEXP sGlobal_Sim_Param_cntrl);
+		virtual void releaseGlobalSimParams();
 
 		virtual void initMonitor(SEXP sMonitor);
+
+		virtual void initDataVariables(SEXP pX, SEXP pY, SEXP pC, SEXP pT);
+		virtual void releaseDataVariables();
+
+		virtual void initL1Variables(SEXP ptheta, SEXP pgamma);
+		virtual void releaseL1Variables();
+
+		virtual void initL2Variables(SEXP pmu_gamma, SEXP pmu_theta,
+										SEXP psigma2_gamma, SEXP psigma2_theta);
+		virtual void releaseL2Variables();
+
+		virtual void initL2Params(SEXP pmu_gamma_0, SEXP ptau2_gamma_0,
+										SEXP pmu_theta_0, SEXP ptau2_theta_0,
+										SEXP palpha_gamma, SEXP pbeta_gamma,
+										SEXP palpha_theta, SEXP pbeta_theta);
+		virtual void releaseL3Variables() {};
+
+		virtual void initL1Samples();
+		virtual void releaseL1Samples();
+
+		virtual void initL2Samples();
+		virtual void releaseL2Samples();
 
 		// We only create the samples if the memory model is HIGH or it is low and the
 		// sample is being monitored
@@ -185,8 +219,8 @@ class c2121a_poisson_mc_hier2_lev0 {
 		// Data values
 		int ***x;
 		int ***y;
-		int ***C;
-		int ***T;
+		double ***C;
+		double ***T;
 
 		// Samples
 		double***** gTheta_samples;

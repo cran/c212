@@ -3,7 +3,7 @@
 # R. Carragher
 # Date: 24/08/2015
 
-Id <- "$Id: c212.interim.BB.hier3.lev1.summary.stats.R,v 1.5 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.BB.hier3.lev1.summary.stats.R,v 1.6 2018/10/04 11:58:24 clb13102 Exp clb13102 $"
 
 c212.interim.BB.dep.lev1.summary.stats <- function(raw)
 {
@@ -223,7 +223,7 @@ c212.interim.BB.dep.lev1.print.summary.stats <- function(summ)
 			cat(sprintf("sigma2.theta[%s]: %0.6f (%0.6f %0.6f) %0.6f %0.6f\n",
 						row$B, row$mean, row$hpi_lower, row$hpi_upper, row$SD, row$SE))
 		}
-	if (pi == 1)
+	if (pi_mon == 1)
 		for (i in 1:nrow(summ$pi.summary)) {
 			row = summ$pi.summary[i, ]
 			cat(sprintf("pi[%s]: %0.6f (%0.6f %0.6f) %0.6f %0.6f\n",

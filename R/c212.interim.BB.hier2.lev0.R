@@ -6,7 +6,7 @@
 
 Mi_BB_h2_l0 <- new.env()
 
-Mi_BB_h2_l0$Id <- "$Id: c212.interim.BB.hier2.lev0.R,v 1.7 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Mi_BB_h2_l0$Id <- "$Id: c212.interim.BB.hier2.lev0.R,v 1.8 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
 
 c212.interim.BB.hier2.lev0 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 60000, nchains = 5,
 	theta_algorithm = "MH",
@@ -109,8 +109,8 @@ c212.interim.BB.hier2.lev0 <- function(trial.data, sim_type = "SLICE", burnin = 
 					as.integer(t(Mi_BB_h2_l0$nAE)),
 					as.integer(aperm(Mi_BB_h2_l0$x)),
 					as.integer(aperm(Mi_BB_h2_l0$y)),
-					as.integer(aperm(Mi_BB_h2_l0$C)),
-					as.integer(aperm(Mi_BB_h2_l0$T)),
+					as.numeric(aperm(Mi_BB_h2_l0$C)),
+					as.numeric(aperm(Mi_BB_h2_l0$T)),
 					as.numeric(aperm(Mi_BB_h2_l0$theta)),
 					as.numeric(aperm(Mi_BB_h2_l0$gamma)),
 					as.numeric(Mi_BB_h2_l0$alpha.gamma),
@@ -256,8 +256,8 @@ Mi_BB_h2_l0$initChains = function(c) {
 			Mi_BB_h2_l0$theta[c, i, b, ][is.infinite(Mi_BB_h2_l0$theta[c, i, b, ])] = -10
 			Mi_BB_h2_l0$gamma[c, i, b, ][is.infinite(Mi_BB_h2_l0$gamma[c, i, b, ])] = -10
 
-			Mi_BB_h2_l0$theta[1, i, b, ][is.nan(Mi_BB_h2_l0$theta[1, i, b, ])] = -10 # -1000
-			Mi_BB_h2_l0$gamma[1, i, b, ][is.nan(Mi_BB_h2_l0$gamma[1, i, b, ])] = -10 # -1000
+			Mi_BB_h2_l0$theta[c, i, b, ][is.nan(Mi_BB_h2_l0$theta[c, i, b, ])] = -10 # -1000
+			Mi_BB_h2_l0$gamma[c, i, b, ][is.nan(Mi_BB_h2_l0$gamma[c, i, b, ])] = -10 # -1000
 		}
 
 		Mi_BB_h2_l0$mu.gamma[c, i, 1:numB] = runif(numB, -10, 10)
@@ -281,7 +281,7 @@ Mi_BB_h2_l0$initialiseChains = function(initial_values, nchains) {
 			numB = Mi_BB_h2_l0$numB[i]
 			for (b in 1:numB) {
 				Mi_BB_h2_l0$gamma[1, i, b, ] <- log(Mi_BB_h2_l0$x[i, b,]/Mi_BB_h2_l0$C[i, b, ])
-				Mi_BB_h2_l0$theta[1, i, b, ] <- log(Mi_BB_h2_l0$y[i, b,]/Mi_BB_h2_l0$T[i]) - Mi_BB_h2_l0$gamma[1, i, b, ]
+				Mi_BB_h2_l0$theta[1, i, b, ] <- log(Mi_BB_h2_l0$y[i, b,]/Mi_BB_h2_l0$T[i, b, ]) - Mi_BB_h2_l0$gamma[1, i, b, ]
 
 				Mi_BB_h2_l0$theta[1, i, b, ][is.infinite(Mi_BB_h2_l0$theta[1, i, b, ])] = -10 # -1000
 				Mi_BB_h2_l0$gamma[1, i, b, ][is.infinite(Mi_BB_h2_l0$gamma[1, i, b, ])] = -10 # -1000

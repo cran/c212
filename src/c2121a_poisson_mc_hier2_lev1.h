@@ -26,6 +26,7 @@ class c2121a_poisson_mc_hier2_lev1 : public c2121a_poisson_mc_hier2_lev0 {
 		virtual void gibbs_sampler();
 
 	protected:
+		virtual void clear();
 		virtual void release();
 		virtual void simulate_MH();
 		virtual void simulate_SLICE();
@@ -42,21 +43,12 @@ class c2121a_poisson_mc_hier2_lev1 : public c2121a_poisson_mc_hier2_lev0 {
 		virtual void sample_theta_SLICE(int burnin, int iter);
 		double cMIN(double a, double b);
 
-		virtual void init(SEXP sChains, SEXP sBurnin, SEXP sIter, SEXP sSim_Type,
-					SEXP sMem_Model,
-					SEXP sGlobal_Sim_Param,
-					SEXP sGlobal_Sim_Param_cntrl,
-					SEXP sSim_Param,
-					SEXP sMonitor,
-					SEXP sNumIntervals,
-					SEXP sMaxBs, SEXP sNumBodySys, SEXP sMaxAEs, SEXP sNAE,
-					SEXP pX, SEXP pY, SEXP pC, SEXP pT, SEXP ptheta, SEXP pgamma,
-					SEXP pmu_gamma_0,
-					SEXP ptau2_gamma_0, SEXP pmu_theta_0, SEXP ptau2_theta_0,
-					SEXP palpha_gamma,
-					SEXP pbeta_gamma, SEXP palpha_theta, SEXP pbeta_theta,
-					SEXP pmu_gamma,
-					SEXP pmu_theta, SEXP psigma2_gamma, SEXP psigma2_theta);
+		virtual void initL2Variables(SEXP pmu_gamma, SEXP pmu_theta,
+								SEXP psigma2_gamma, SEXP psigma2_theta);
+		virtual void releaseL2Variables();
+
+		virtual void initL2Samples();
+		virtual void releaseL2Samples();
 
 		virtual SEXP getL2Samples(double*** &data);
 
