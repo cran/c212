@@ -98,9 +98,11 @@ c212.eot.gen.initial.values = function(trial.data, nchains, model) {
 	chain = rep(1, n)
 	
 	t = data
-	for (c in 2:nchains) {
-		t = rbind(t, data)
-		chain = c(chain, rep(c, n))
+	if (nchains > 1) {
+		for (c in 2:nchains) {
+			t = rbind(t, data)
+			chain = c(chain, rep(c, n))
+		}
 	}
 	t = cbind(t, chain)
 
@@ -297,6 +299,9 @@ c212.interim.gen.initial.values = function(trial.data, nchains, model, hier, lev
 
 	ga[is.infinite(ga)] = -10 
 	th[is.infinite(th)] = -10 
+
+	ga[is.nan(ga)] = -10
+	th[is.nan(th)] = -10
 
 	gamma$value[1:n] = ga
 	theta$value[1:n] = th

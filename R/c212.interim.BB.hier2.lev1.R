@@ -6,7 +6,7 @@
 
 Mi_BB_h2_l1 <- new.env()
 
-Mi_BB_h2_l1$Id <- "$Id: c212.interim.BB.hier2.lev1.R,v 1.8 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
+Mi_BB_h2_l1$Id <- "$Id: c212.interim.BB.hier2.lev1.R,v 1.9 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.BB.hier2.lev1 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 60000, nchains = 5,
 	theta_algorithm = "MH",
@@ -223,14 +223,6 @@ Mi_BB_h2_l1$initVars = function() {
     Mi_BB_h2_l1$T <- array()
 
     # Hyperparameters
-    Mi_BB_h2_l1$mu.gamma.0.0 <- NA
-    Mi_BB_h2_l1$tau2.gamma.0.0 <- NA
-    Mi_BB_h2_l1$mu.theta.0.0 <- NA
-    Mi_BB_h2_l1$tau2.theta.0.0 <- NA
-    Mi_BB_h2_l1$alpha.gamma.0.0 <- NA
-    Mi_BB_h2_l1$beta.gamma.0.0 <- NA
-    Mi_BB_h2_l1$alpha.theta.0.0 <- NA
-    Mi_BB_h2_l1$beta.theta.0.0 <- NA
     Mi_BB_h2_l1$alpha.gamma <- NA
     Mi_BB_h2_l1$beta.gamma <- NA
     Mi_BB_h2_l1$alpha.theta <- NA

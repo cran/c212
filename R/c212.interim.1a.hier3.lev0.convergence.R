@@ -6,7 +6,7 @@
 # If the MCMC simulation has been run for only one chain report the Geweke diagnostic (Z-score)
 #
 
-Id <- "$Id: c212.interim.1a.hier3.lev0.convergence.R,v 1.8 2016/12/19 11:36:43 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.1a.hier3.lev0.convergence.R,v 1.9 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.1a.indep.convergence.diag <- function(raw, debug_diagnostic = FALSE)
 {
@@ -645,14 +645,5 @@ c212.interim.1a.indep.print.convergence.summary <- function(conv) {
 			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$gamma_acc$rate),
 												max(conv$gamma_acc$rate)))
 		}
-	}
-}
-
-chk_val <- function(val, q = 0.975) {
-	if (abs(val) > qnorm(q)) {
-		return("*")
-	}
-	else {
-		return("-")
 	}
 }

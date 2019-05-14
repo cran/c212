@@ -3,7 +3,7 @@
 # R. Carragher
 # Date: 28/11/2014
 
-Id <- "$Id: c212.interim.1a.hier3.lev1.summary.stats.R,v 1.6 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.1a.hier3.lev1.summary.stats.R,v 1.7 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.1a.dep.lev1.summary.stats <- function(raw)
 {
@@ -71,7 +71,7 @@ c212.interim.1a.dep.lev1.summary.stats <- function(raw)
 
 	samples_combined <- rep(NA, (raw$iter - raw$burnin)*nchains)
 
-	for (i in 1:raw$nInterval) {
+	for (i in 1:raw$nIntervals) {
 		for (b in 1:raw$nBodySys[i]) {
 			bs = raw$B[i,b]
 			for (j in 1:raw$nAE[i, b]) {
@@ -80,7 +80,7 @@ c212.interim.1a.dep.lev1.summary.stats <- function(raw)
 				# gamma
 				if (gamma_mon == 1) {
 					s = M_global$summaryStats(raw$gamma[, i, b, j, ], nchains)
-					row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b],
+					row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b],
 								AE = raw$AE[i, b,j], mean = s[1],
 								hpi_lower = s[3], hpi_upper = s[4], SD = s[5],
 								SE = s[6])
@@ -90,7 +90,7 @@ c212.interim.1a.dep.lev1.summary.stats <- function(raw)
 				# theta
 				if (theta_mon == 1) {
 					s = M_global$summaryStats(raw$theta[, i, b, j, ], nchains)
-					row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b],
+					row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b],
 								AE = raw$AE[i, b,j], mean = s[1],
 								hpi_lower = s[3], hpi_upper = s[4], SD = s[5],
 								SE = s[6])

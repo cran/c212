@@ -3,7 +3,7 @@
 # R. Carragher
 # Date: 28/11/2014
 
-Id <- "$Id: c212.interim.1a.hier3.lev0.summary.stats.R,v 1.8 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.1a.hier3.lev0.summary.stats.R,v 1.9 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.1a.indep.summary.stats <- function(raw)
 {
@@ -71,7 +71,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 
 	samples_combined = rep(NA, (raw$iter - raw$burnin)*nchains)
 
-	for (i in 1:raw$nInterval) {
+	for (i in 1:raw$nIntervals) {
 		for (b in 1:raw$nBodySys[i]) {
 			bs = raw$B[i,b]
 			for (j in 1:raw$nAE[i, b]) {
@@ -80,7 +80,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 				# gamma
 				if (gamma_mon == 1) {
 					s = M_global$summaryStats(raw$gamma[, i, b, j, ], nchains)
-					row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b],
+					row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b],
 						AE = raw$AE[i, b,j], mean = s[1],
 						hpi_lower = s[3], hpi_upper = s[4], SD = s[5],
 						SE = s[6])
@@ -90,7 +90,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 				# theta
 				if (theta_mon == 1) {
 					s = M_global$summaryStats(raw$theta[, i, b, j, ], nchains)
-					row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b],
+					row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b],
 						AE = raw$AE[i, b,j], mean = s[1],
 						hpi_lower = s[3], hpi_upper = s[4], SD = s[5],
 						SE = s[6])
@@ -101,7 +101,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 			# mu.gamma
 			if (mu.gamma_mon == 1) {
 				s = M_global$summaryStats(raw$mu.gamma[, i, b, ], nchains)
-				row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b], mean = s[1],
+				row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4], SD = s[5], SE = s[6])
 				mu.gamma_summ = rbind(mu.gamma_summ, row)
 			}
@@ -109,7 +109,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 			# mu.theta
 			if (mu.theta_mon == 1) {
 				s = M_global$summaryStats(raw$mu.theta[, i, b, ], nchains)
-				row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b], mean = s[1],
+				row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4], SD = s[5], SE = s[6])
 				mu.theta_summ = rbind(mu.theta_summ, row)
 			}
@@ -117,7 +117,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 			# sigma2.theta
 			if (sigma2.theta_mon == 1) {
 				s = M_global$summaryStats(raw$sigma2.theta[, i, b, ], nchains)
-				row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b], mean = s[1],
+				row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4], SD = s[5], SE = s[6])
 				sigma2.theta_summ = rbind(sigma2.theta_summ, row)
 			}
@@ -125,18 +125,18 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 			# sigma2.gamma
 			if (sigma2.gamma_mon == 1) {
 				s = M_global$summaryStats(raw$sigma2.gamma[, i, b, ], nchains)
-				row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b], mean = s[1],
+				row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4], SD = s[5], SE = s[6])
 				sigma2.gamma_summ = rbind(sigma2.gamma_summ, row)
 			}
 		}
 	}
 
-	for (i in 1:raw$nInterval) {
+	for (i in 1:raw$nIntervals) {
 		# mu.gamma.0
 		if (mu.gamma.0_mon == 1) {
 			s = M_global$summaryStats(raw$mu.gamma.0[, i, ], nchains)
-			row <- data.frame(interval = raw$Interval[i], mean = s[1],
+			row <- data.frame(interval = raw$Intervals[i], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4],
 							SD = s[5], SE = s[6])
 			mu.gamma.0_summ = rbind(mu.gamma.0_summ, row)
@@ -145,7 +145,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 		# mu.theta.0
 		if (mu.theta.0_mon == 1) {
 			s = M_global$summaryStats(raw$mu.theta.0[, i, ], nchains)
-			row <- data.frame(interval = raw$Interval[i], mean = s[1],
+			row <- data.frame(interval = raw$Intervals[i], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4],
 							SD = s[5], SE = s[6])
 			mu.theta.0_summ = rbind(mu.theta.0_summ, row)
@@ -154,7 +154,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 		# tau2.gamma.0
 		if (tau2.gamma.0_mon == 1) {
 			s = M_global$summaryStats(raw$tau2.gamma.0[, i, ], nchains)
-			row <- data.frame(interval = raw$Interval[i], mean = s[1],
+			row <- data.frame(interval = raw$Intervals[i], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4],
 							SD = s[5], SE = s[6])
 			tau2.gamma.0_summ = rbind(tau2.gamma.0_summ, row)
@@ -163,7 +163,7 @@ c212.interim.1a.indep.summary.stats <- function(raw)
 		# tau2.theta.0
 		if (tau2.theta.0_mon == 1) {
 			s = M_global$summaryStats(raw$tau2.theta.0[, i, ], nchains)
-			row <- data.frame(interval = raw$Interval[i], mean = s[1],
+			row <- data.frame(interval = raw$Intervals[i], mean = s[1],
 							hpi_lower = s[3], hpi_upper = s[4],
 							SD = s[5], SE = s[6])
 			tau2.theta.0_summ = rbind(tau2.theta.0_summ, row)

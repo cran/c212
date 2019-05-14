@@ -6,7 +6,7 @@
 # If the MCMC simulation has been run for only one chain report the Geweke diagnostic (Z-score)
 #
 
-Id <- "$Id: c212.interim.BB.hier2.lev0.convergence.R,v 1.6 2016/12/19 11:36:43 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.BB.hier2.lev0.convergence.R,v 1.7 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.BB.hier2.lev0.convergence.diag <- function(raw, debug_diagnostic = FALSE)
 {
@@ -177,7 +177,7 @@ c212.interim.BB.hier2.lev0.print.convergence.summary <- function(conv) {
 			cat(sprintf("Max Gelman-Rubin diagnostic (%s %s %s): %0.6f\n", max_t$Interval, max_t$B, max_t$AE, max_t$stat))
 			min_t = head(conv$theta.conv.diag[conv$theta.conv.diag$stat == min(conv$theta.conv.diag$stat),,
 						drop = FALSE], 1)
-			cat(sprintf("Min Gelman-Rubin diagnostic (%s, %s %s): %0.6f\n", min_t$Interval, min_t$B, min_t$AE, min_t$stat))
+			cat(sprintf("Min Gelman-Rubin diagnostic (%s %s %s): %0.6f\n", min_t$Interval, min_t$B, min_t$AE, min_t$stat))
 		}
 	
 		if (gamma_mon == 1) {
@@ -369,14 +369,5 @@ c212.interim.BB.hier2.lev0.print.convergence.summary <- function(conv) {
 			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$theta_acc$rate),
 											max(conv$theta_acc$rate)))
 		}
-	}
-}
-
-chk_val <- function(val, q = 0.975) {
-	if (abs(val) > qnorm(q)) {
-		return("*")
-	}
-	else {
-		return("-")
 	}
 }

@@ -7,7 +7,7 @@
 # If the MCMC simulation has been run for only one chain report the Geweke diagnostic (Z-score)
 #
 
-Id <- "$Id: c212.interim.BB.hier2.lev1.convergence.R,v 1.6 2016/12/19 11:36:43 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.BB.hier2.lev1.convergence.R,v 1.7 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.BB.hier2.lev1.convergence.diag <- function(raw, debug_diagnostic = FALSE)
 {
@@ -60,7 +60,7 @@ c212.interim.BB.hier2.lev1.convergence.diag <- function(raw, debug_diagnostic = 
 			i = 1
 			for (b in 1:raw$nBodySys[i]) {
 				# pi
-				g = M_global$Geweke(raw$mu.gamma[1, b, ])
+				g = M_global$Geweke(raw$pi[1, b, ])
 				row <- data.frame(B = raw$B[i, b], stat = g$z, upper_ci = NA, stringsAsFactors=FALSE)
 				pi_conv = rbind(pi_conv, row)
 			}
@@ -363,14 +363,5 @@ c212.interim.BB.hier2.lev1.print.convergence.summary <- function(conv) {
 			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$theta_acc$rate),
 										max(conv$theta_acc$rate)))
 		}
-	}
-}
-
-chk_val <- function(val, q = 0.975) {
-	if (abs(val) > qnorm(q)) {
-		return("*")
-	}
-	else {
-		return("-")
 	}
 }

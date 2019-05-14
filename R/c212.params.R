@@ -20,6 +20,9 @@ c212.1a.sim.control.params = function(trial.data) {
 	trial.data = trial.data[trial.data$Group == 2,]
 	n = nrow(trial.data)
 
+    facs <- sapply(trial.data, is.factor)
+    trial.data[facs] <- sapply(trial.data[facs], as.character)
+
 	if ("Interval" %in% names(trial.data)) {
 
 		p_SLICE = "w"
@@ -104,6 +107,9 @@ c212.BB.sim.control.params = function(trial.data) {
 		trial.data <- read.table(file, header=TRUE, stringsAsFactors = FALSE)
 	}
 
+    facs <- sapply(trial.data, is.factor)
+    trial.data[facs] <- sapply(trial.data[facs], as.character)
+
 	trial.data = trial.data[trial.data$Group == 2,]
 
 	if ("Interval" %in% names(trial.data)) {
@@ -143,40 +149,41 @@ c212.BB.sim.control.params = function(trial.data) {
 								stringsAsFactors = FALSE)
 
 		sp4 = data.frame(type = "MH", variable = "alpha",
-								Interval = trial.data$Interval,
-								I_index = trial.data$I_index,
-								B = trial.data$B,
-								AE = trial.data$AE, 
+								Interval = unique(trial.data$Interval),
+								I_index = unique(trial.data$I_index),
+								B = NA,
+								AE = NA,
 								param = "sigma_MH_alpha", value = v_sigma,
 								control = 0,
 								stringsAsFactors = FALSE)
 
 		sp5 = data.frame(type = "SLICE", variable = "alpha",
-								Interval = trial.data$Interval,
-								I_index = trial.data$I_index,
-								B = trial.data$B,
-								AE = trial.data$AE, 
+								Interval = unique(trial.data$Interval),
+								I_index = unique(trial.data$I_index),
+								B = NA,
+								AE = NA,
 								param = "w_alpha", value = v_w,
 								control = v_w_control,
 								stringsAsFactors = FALSE)
 
 		sp6 = data.frame(type = "MH", variable = "beta",
-								Interval = trial.data$Interval,
-								I_index = trial.data$I_index,
-								B = trial.data$B,
-								AE = trial.data$AE, 
+								Interval = unique(trial.data$Interval),
+								I_index = unique(trial.data$I_index),
+								B = NA,
+								AE = NA,
 								param = "sigma_MH_beta", value = v_sigma,
 								control = 0,
 								stringsAsFactors = FALSE)
 
 		sp7 = data.frame(type = "SLICE", variable = "beta",
-								Interval = trial.data$Interval,
-								I_index = trial.data$I_index,
-								B = trial.data$B,
-								AE = trial.data$AE, 
+								Interval = unique(trial.data$Interval),
+								I_index = unique(trial.data$I_index),
+								B = NA,
+								AE = NA,
 								param = "w_beta", value = v_w,
 								control = v_w_control,
 								stringsAsFactors = FALSE)
+
 
 		sim_params = rbind(sp1, sp2, sp3, sp4, sp5, sp6, sp7)
 

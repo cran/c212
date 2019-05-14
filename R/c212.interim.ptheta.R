@@ -3,7 +3,7 @@
 # R. Carragher
 # Date: 28/11/2014
 
-Id <- "$Id: c212.interim.ptheta.R,v 1.4 2016/10/14 10:39:05 clb13102 Exp clb13102 $"
+Id <- "$Id: c212.interim.ptheta.R,v 1.5 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.ptheta <- function(raw)
 {
@@ -58,7 +58,7 @@ c212.interim.ptheta <- function(raw)
 	# Inference - based on combined chains:\n")
 	samples_combined = rep(NA, (raw$iter - raw$burnin)*nchains)
 
-	for (i in 1:raw$nInterval) {
+	for (i in 1:raw$nIntervals) {
 		for (b in 1:raw$nBodySys[i]) {
 			for (j in 1:raw$nAE[i, b]) {
 				mcmc_obj <- list(NA)
@@ -70,7 +70,7 @@ c212.interim.ptheta <- function(raw)
 				samples_combined <- c(raw$theta[1:nchains, i, b, j, ])
 				s <- ecdf(samples_combined)
 				th <-  1 - s(0)
-				row <- data.frame(interval = raw$Interval[i], B = raw$B[i, b], AE = raw$AE[i, b, j], ptheta = th)
+				row <- data.frame(interval = raw$Intervals[i], B = raw$B[i, b], AE = raw$AE[i, b, j], ptheta = th)
 				summ = rbind(summ, row)
 			}
 		}

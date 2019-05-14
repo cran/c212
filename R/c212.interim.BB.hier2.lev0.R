@@ -6,7 +6,7 @@
 
 Mi_BB_h2_l0 <- new.env()
 
-Mi_BB_h2_l0$Id <- "$Id: c212.interim.BB.hier2.lev0.R,v 1.8 2018/10/03 15:40:56 clb13102 Exp clb13102 $"
+Mi_BB_h2_l0$Id <- "$Id: c212.interim.BB.hier2.lev0.R,v 1.9 2019/05/05 13:18:12 clb13102 Exp clb13102 $"
 
 c212.interim.BB.hier2.lev0 <- function(trial.data, sim_type = "SLICE", burnin = 10000, iter = 60000, nchains = 5,
 	theta_algorithm = "MH",
@@ -323,22 +323,22 @@ Mi_BB_h2_l0$initialiseChains = function(initial_values, nchains) {
 					Mi_BB_h2_l0$mu.gamma[c, i, b] = data$value
 
 					data = initial_values$mu.theta[initial_values$mu.theta$chain == c &
-												initial_values$mu.gamma$Interval == interval
+												initial_values$mu.theta$Interval == interval
 												& initial_values$mu.theta$B == Mi_BB_h2_l0$B[1, b],]
 					Mi_BB_h2_l0$mu.theta[c, i, b] = data$value
 
 					data = initial_values$sigma2.gamma[initial_values$sigma2.gamma$chain == c &
-												initial_values$mu.gamma$Interval == interval
+												initial_values$sigma2.gamma$Interval == interval
 												& initial_values$sigma2.gamma$B == Mi_BB_h2_l0$B[1, b],]
 					Mi_BB_h2_l0$sigma2.gamma[c, i, b] = data$value
 
 					data = initial_values$sigma2.theta[initial_values$sigma2.theta$chain == c &
-												initial_values$mu.gamma$Interval == interval
+												initial_values$sigma2.theta$Interval == interval
 												& initial_values$sigma2.theta$B == Mi_BB_h2_l0$B[1, b],]
 					Mi_BB_h2_l0$sigma2.theta[c, i, b] = data$value
 
 					data = initial_values$pi[initial_values$pi$chain == c &
-												initial_values$mu.gamma$Interval == interval
+												initial_values$pi$Interval == interval
 												& initial_values$pi$B == Mi_BB_h2_l0$B[1, b],]
 					Mi_BB_h2_l0$pi[c, i, b] = data$value
 				}

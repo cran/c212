@@ -632,8 +632,18 @@ M_global$INTERIM_sim_paramsBB_3 <- function(M_env, sim.params, pm.weights, sim_t
 
 			gamma.params = sim.params[sim.params$variable == "gamma",]
 			theta.params = sim.params[sim.params$variable == "theta",]
-			alpha.params = sim.params[sim.params$variable == "beta",]
-			beta.params = sim.params[sim.params$variable == "alpha",]
+			alpha.params = sim.params[sim.params$variable == "alpha",]
+			beta.params = sim.params[sim.params$variable == "beta",]
+
+			# If used at all, alpha/beta apply to Intervals only
+			if (nrow(alpha.params) > 0) {
+				alpha.params$B <- NA
+				alpha.params$AE <- NA
+			}
+			if (nrow(beta.params) > 0) {
+				beta.params$B <- NA
+				beta.params$AE <- NA
+			}
 
 			if (!identical(cntrl.data$B, gamma.params$B) ||
 				!identical(cntrl.data$AE, gamma.params$AE) ||
@@ -641,12 +651,8 @@ M_global$INTERIM_sim_paramsBB_3 <- function(M_env, sim.params, pm.weights, sim_t
 				!identical(cntrl.data$B, theta.params$B) ||
 				!identical(cntrl.data$AE, theta.params$AE) || 
 				!identical(cntrl.data$Interval, theta.params$Interval) ||
-				!identical(cntrl.data$B, alpha.params$B) ||
-				!identical(cntrl.data$AE, alpha.params$AE) || 
-				!identical(cntrl.data$Interval, alpha.params$Interval) ||
-				!identical(cntrl.data$B, beta.params$B) ||
-				!identical(cntrl.data$AE, beta.params$AE) || 
-				!identical(cntrl.data$Interval, beta.params$Interval)) {
+				!identical(unique(cntrl.data$Interval), alpha.params$Interval) ||
+				!identical(unique(cntrl.data$Interval), beta.params$Interval)) {
 
 				# If we don't have a full set then we need to merge the values
 				params = c212.sim.control.params(trial.data, "BB")
@@ -681,14 +687,14 @@ M_global$INTERIM_sim_paramsBB_3 <- function(M_env, sim.params, pm.weights, sim_t
 			theta.params = cbind(theta.params, j)
 
 			alpha.params = alpha.params[, !(names(alpha.params) %in% c("Interval", "I_index","B", "AE"))]
-			alpha.params = cbind(alpha.params, I_index)
-			alpha.params = cbind(alpha.params, B)
-			alpha.params = cbind(alpha.params, j)
+			alpha.params = cbind(alpha.params, I_index = unique(I_index))
+			alpha.params$B <- NA
+			alpha.params$j <- NA
 
 			beta.params = beta.params[, !(names(beta.params) %in% c("Interval", "I_index","B", "AE"))]
-			beta.params = cbind(beta.params, I_index)
-			beta.params = cbind(beta.params, B)
-			beta.params = cbind(beta.params, j)
+			beta.params = cbind(beta.params, I_index = unique(I_index))
+			beta.params$B <- NA
+			beta.params$j <- NA
 
 			sim.params = rbind(gamma.params, theta.params, alpha.params, beta.params)
 			sim.params = sim.params[!is.na(sim.params$value), ]
