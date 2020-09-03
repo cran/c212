@@ -32,8 +32,20 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+c212.monitor.samples("1a", hier = 3)
 \dontrun{
 c212.monitor.samples("1a", hier = 3)
+       variable monitor
+1         theta       1
+2         gamma       0
+3      mu.gamma       0
+4      mu.theta       0
+5  sigma2.theta       0
+6  sigma2.gamma       0
+7    mu.theta.0       0
+8    mu.gamma.0       0
+9  tau2.theta.0       0
+10 tau2.gamma.0       0
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

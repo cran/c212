@@ -46,10 +46,10 @@ The number of independent chains to run.
 MCMC algorithm used to sample the theta variables. "MH" is the only currently supported stable algorithm.
 }
   \item{sim_type}{
-The type of MCMC method to use for simulating from non-standard distributions apart from theta. Allowed values are \emph{"MH"} and \emph{"SLICE"} for Metropis_Hastings and Slice sampling respectively.
+The type of MCMC method to use for simulating from non-standard distributions apart from theta. Allowed values are \emph{"MH"} and \emph{"SLICE"} for Metropolis_Hastings and Slice sampling respectively.
 }
 \item{global.sim.params}{
-A data frame containing the parameters for the simuation type \emph{sim_type}. For \emph{"MH"} the parameter
+A data frame containing the parameters for the simulation type \emph{sim_type}. For \emph{"MH"} the parameter
 is the variance of the normal distribution used to simulate the next candidate value centred on the current
 value. For \emph{"SLICE"} the parameters are the estimated width of the slice and a value limiting the search for the next sample.
 }
@@ -80,7 +80,7 @@ The formats of the list elements are as follows:
 
 }
   \item{hyper_params}{
-The hyperparameters for the model. The default hyperparamters are those given in Berry and Berry 2004.
+The hyperparameters for the model. The default hyperparameters are those given in Berry and Berry 2004.
 }
 
 \item{global.pm.weight}{A global weighting for the proposal distribution used to sample theta.}
@@ -108,11 +108,11 @@ list(id, theta_alg, sim_type, chains, nBodySys, maxAEs, nAE, AE, B,
 }
 where
 
-\emph{id} - a string identifying the verions of the function
+\emph{id} - a string identifying the version of the function
 
-\emph{theta_alg} - an string identifying the algorithm used to smaple theta
+\emph{theta_alg} - an string identifying the algorithm used to sample theta
 
-\emph{sim_type} - an string identifying the samlping method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
+\emph{sim_type} - an string identifying the sampling method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
 
 \emph{chains} - the number of chains for which the simulation was run
 
@@ -167,7 +167,7 @@ S. M. Berry and D. A. Berry (2004). Accounting for multiplicities in assessing d
 level hierarchical mixture model.
 Biometrics, 60(2):418-26.
 
-H. Amy Xia, Haijun Ma, and Bradley P. Carlin (2011). Bayesian hierarchical modeling for
+H. Amy Xia, Haijun Ma, and Bradley P. Carlin (2011). Bayesian hierarchical modelling for
 detecting safety signals in clinical trials. Journal of Biopharmaceutical Statistics, 21(5):1006–
 1029.
 
@@ -223,6 +223,9 @@ The function performs the simulation and returns the raw output. No checks for c
 %%450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
 %%450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
 %%450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450))
+
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
 
 \dontrun{
 %%rm = c212.BB(trial.data, nchains = 3)

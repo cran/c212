@@ -2,7 +2,7 @@
 \alias{c212.LSL}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Implementaion of the least-slope estimator estimator (LSL) for the proprtion of true null hypotheses.
+Implementaion of the least-slope estimator estimator (LSL) for the proportion of true null hypotheses.
 }
 \description{
 The least-slope estimator estimator (LSL) is one of a number of estimators of the proportion of true null hypotheses. This implementation assumes a grouped structure for the data.
@@ -34,6 +34,22 @@ The implementation is that described in Hu, J. X. and Zhao, H. and Zhou, H. H. (
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
+\examples{
+data(c212.FDR.data)
+lsl <- c212.LSL(c212.FDR.data)
+print(lsl)
+\dontrun{
+          B       pi0
+1 Bdy-sys_5 1.0000000
+2 Bdy-sys_6 1.0000000
+3 Bdy-sys_7 1.0000000
+4 Bdy-sys_8 1.0000000
+5 Bdy-sys_2 1.0000000
+6 Bdy-sys_3 0.2857143
+7 Bdy-sys_4 1.0000000
+8 Bdy-sys_1 1.0000000
+}
+}
 
 %%+\examples{
 %%+##---- Should be DIRECTLY executable !! ----

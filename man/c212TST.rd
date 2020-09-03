@@ -2,7 +2,7 @@
 \alias{c212.TST}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Implementaion of the two-stage estimator (TST) for the proprtion of true null hypotheses.
+Implementaion of the two-stage estimator (TST) for the proportion of true null hypotheses.
 }
 \description{
 The two-stage estimator (TST) is one of a number of estimators of the proportion of true null hypotheses. It
@@ -38,6 +38,22 @@ R. Carragher<raymond.carragher@strath.ac.uk>
 The implementation is that described in Hu, J. X. and Zhao, H. and Zhou, H. H. (2010).
 }
 %% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\examples{
+data(c212.FDR.data)
+c212.TST(c212.FDR.data)
+\dontrun{
+          B pi0
+1 Bdy-sys_5 1.0
+2 Bdy-sys_6 1.0
+3 Bdy-sys_7 1.0
+4 Bdy-sys_8 1.0
+5 Bdy-sys_2 0.5
+6 Bdy-sys_3 0.0
+7 Bdy-sys_4 1.0
+8 Bdy-sys_1 1.0
+}
+}
 
 %%+\examples{
 %%+##---- Should be DIRECTLY executable !! ----

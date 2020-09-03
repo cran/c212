@@ -33,7 +33,7 @@ The dependency level in the model: 0, 1, 2.
 }
 
 \value{
-A dataframe containing the template of intial values.
+A dataframe containing the template of initial values.
 }
 \author{
 R. Carragher
@@ -42,9 +42,13 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+init.vals <- c212.gen.initial.values(c212.trial.data)
+print(init.vals$mu.gamma.0)
 \dontrun{
 data(c212.trial.data)
-c212.gen.initial.values(c212.trial.data)
+init.vals <- c212.gen.initial.values(c212.trial.data)
+print(init.vals$mu.gamma.0)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

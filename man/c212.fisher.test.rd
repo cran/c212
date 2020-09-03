@@ -23,7 +23,7 @@ Alternative hypothesis may be "two.sided", "greater" or "less". The default is "
 
 \value{
 Dataframe containing the results of the test. A copy of the input dataframe with an additional column \emph{p} containing the
-p-value frmo the test.
+p-value from the test.
 }
 \author{
 R. Carragher
@@ -35,6 +35,8 @@ Wrapper for the R function 'fisher.test' in package 'stats'.}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+f = c212.fisher.test(c212.trial.data)
 
 \dontrun{
 data(c212.trial.data)

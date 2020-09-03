@@ -26,7 +26,7 @@ Apply a continuity correction.
 
 \value{
 Dataframe containing the results of the test. A copy of the input dataframe with an additional column \emph{p} containing the
-p-value frmo the test.
+p-value from the test.
 }
 \author{
 R. Carragher
@@ -39,18 +39,18 @@ Wrapper for the R function 'prop.test' in package 'stats'.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
-
-\dontrun{
 data(c212.trial.data)
 pr = c212.bin.test(c212.trial.data)
 head(pr)
+
+\dontrun{
           B j       AE            p
-1 Bdy-sys_1 1 Adv-Ev_1 3.176140e-01
-2 Bdy-sys_2 1 Adv-Ev_2 1.011600e-02
-3 Bdy-sys_2 2 Adv-Ev_3 2.687532e-02
-4 Bdy-sys_2 3 Adv-Ev_4 6.714994e-01
-5 Bdy-sys_2 4 Adv-Ev_5 7.590387e-01
-6 Bdy-sys_3 1 Adv-Ev_6 1.000218e-06
+1 Bdy-sys_1 1 Adv-Ev_1 2.893605e-01
+2 Bdy-sys_2 1 Adv-Ev_2 5.711463e-03
+3 Bdy-sys_2 2 Adv-Ev_3 1.655715e-02
+4 Bdy-sys_2 3 Adv-Ev_4 6.497695e-01
+5 Bdy-sys_2 4 Adv-Ev_5 7.433433e-01
+6 Bdy-sys_3 1 Adv-Ev_6 8.419469e-08
 
 }
 }

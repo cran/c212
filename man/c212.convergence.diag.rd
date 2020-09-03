@@ -8,7 +8,7 @@ It returns the convergence diagnostics and, if applicable, the acceptance rates 
 }
 \details{
 parameter is time consuming. This function applies one of two convergence diagnostics to the raw output of a model simulation
-in order to allow convergence to be assessed. The two diagnotics are:
+in order to allow convergence to be assessed. The two diagnostics are:
 
 i) Gelman-Rubin diagnostic - used when there is more than one chain. A value close to 1 is consistent with
 an MCMC simulation which has converged. The `coda' diagnostic returns a point estimate and upper confidence
@@ -46,7 +46,7 @@ list(sim_type, gamma.conv.diag, theta.conv.diag, mu.gamma.conv.diag,
                        mu.theta.0.conv.diag, tau2.gamma.0.conv.diag,
                        tau2.theta.0.conv.diag)
 }
-Additional columns which may be used to indentify the individual samples are \emph{B}, the body-system, and
+Additional columns which may be used to identify the individual samples are \emph{B}, the body-system, and
 \emph{AE}, the Adverse Event and \emph{interval}.
 }
 \author{
@@ -56,6 +56,9 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+conv = c212.convergence.diag(raw)
 
 \dontrun{
 data(c212.trial.data)

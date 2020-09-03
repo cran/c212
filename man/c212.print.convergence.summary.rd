@@ -12,7 +12,7 @@ for each group of samples, e.g. theta, gamma, mu.gamma etc.
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{conv}{
-The output from a call to \emph{c212.check.convergence}.
+The output from a call to \emph{c212.convergence.diag}.
 }
 }
 \value{
@@ -30,10 +30,14 @@ may have converged.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+conv = c212.convergence.diag(raw)
+c212.print.convergence.summary(conv)
 \dontrun{
 data(c212.trial.data)
 raw = c212.BB(c212.trial.data)
-conv = c212.check.convergence(rm)
+conv = c212.convergence.diag(raw)
 c212.print.convergence.summary(conv)
 }
 }

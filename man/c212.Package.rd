@@ -10,13 +10,13 @@ Clinical Trial Adverse Event Incidence Data of Berry and Berry (2004)
 and an implementation of the same model without the Point Mass (Model 1a from Xia et al (2011)), extended Bayesian hierarchical methods
 based on system organ class or body-system groupings for interim analyses.
 The package also implements a number of methods for error control when testing multiple hypotheses, specifically control of the False
-Discovey Rate (FDR). The FDR control methods implemented are the Benjamini-Hochberg procedure, the Double False Discovery Rate, the Group
+Discovery Rate (FDR). The FDR control methods implemented are the Benjamini-Hochberg procedure, the Double False Discovery Rate, the Group
 Benjamini-Hochberg and subset Benjamini-Hochberg methods. Also included are the Bonferroni correction and the unadjusted testing procedure.}
 
 \details{
 The methods implemented use assumed groupings of adverse events by body-system or system organ class to 
 detect differences in the occurrence of adverse events on trial arms. Methods based on Bayesian Hierarchical
-modles and  direct error controlling procedures are provided.
+models and  direct error controlling procedures are provided.
 
 The basic (Bayesian) hierarchical models are described in Berry and Berry (2004), Xia et al (2011) (Model 1a) and
 Berry et al (2010). These methods are extended for interim analyses.
@@ -41,7 +41,7 @@ S. M. Berry and D. A. Berry (2004). Accounting for multiplicities in assessing d
 level hierarchical mixture model.
 Biometrics, 60(2):418-26.
 
-H. Amy Xia, Haijun Ma, and Bradley P. Carlin (2011). Bayesian hierarchical modeling for
+H. Amy Xia, Haijun Ma, and Bradley P. Carlin (2011). Bayesian hierarchical modelling for
 detecting safety signals in clinical trials. Journal of Biopharmaceutical Statistics, 21(5):1006–
 1029.
 

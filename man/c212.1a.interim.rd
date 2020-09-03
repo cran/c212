@@ -1,34 +1,31 @@
-\name{c212.interim.BB.hier2}
-\alias{c212.interim.BB.hier2}
+\name{c212.1a.interim}
+\alias{c212.1a.interim}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{A Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
+\title{A Two or Three-Level Hierarchical Body-system based Model for interim analysis without Point-Mass.}
 \description{
-Implementation of a Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
+Implementation of a Two or Three-Level Hierarchical Body-system based Model for interim analysis without Point-Mass.}
+
 \usage{
-	c212.interim.BB.hier2(trial.data, sim_type = "SLICE", burnin = 20000,
-	iter = 60000, nchains = 5, theta_algorithm = "MH",
-	global.sim.params = data.frame(type = c("MH", "MH", "MH", "MH",
-	"SLICE", "SLICE", "SLICE"),
-	param = c("sigma_MH_alpha", "sigma_MH_beta", "sigma_MH_gamma",
-	"sigma_MH_theta", "w_alpha", "w_beta", "w_gamma"),
-	value = c(3, 3, 0.2, 0.5, 1, 1, 1), control = c(0, 0, 0, 0, 6, 6, 6),
-	stringsAsFactors = FALSE),
-	sim.params = NULL,
-	monitor = data.frame(variable = c("theta", "gamma", "mu.gamma",
-	"mu.theta", "sigma2.theta", "sigma2.gamma", "pi"),
-	monitor = c(1, 1, 1, 1, 1, 1, 1), stringsAsFactors = FALSE),
-	initial_values = NULL, level = 1,
-	hyper_params = list(mu.gamma.0 = 0, tau2.gamma.0 = 10, mu.theta.0 = 0,
-	tau2.theta.0 = 10, alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
-	beta.theta = 1, alpha.pi = 1.1, beta.pi = 1.1),
-	global.pm.weight = 0.5,
-	pm.weights = NULL,
-	adapt_phase=1, memory_model = "HIGH")
+	c212.1a.interim(trial.data, sim_type = "SLICE", burnin = 10000,
+		iter = 40000, nchains = 3,
+		global.sim.params = NULL,
+		sim.params = NULL,
+		monitor = NULL,
+		initial_values = NULL,
+		hier = 3,
+		level = 1,
+		hyper_params = NULL,
+		memory_model = "HIGH")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{trial.data}{
-A file or data frame containing the trial data. It must contain must contain the columns \emph{B} (body-system), \emph{AE} (adverse event), \emph{Group} (1 - control, 2 treatment), \emph{Count} (total number of events), \emph{Total} (total number of participants).
+A file or data frame containing the trial data. It must contain must contain the columns \emph{I_index} (interval index), \emph{B} (body-system), \emph{AE} (adverse event), \emph{Group} (1 - control, 2 treatment), \emph{Count} (total number of events), \emph{Total} (total number of participants in the trial
+arm).
+}
+  \item{sim_type}{
+The type of MCMC method to use for simulating from non-standard distributions. Allowed values are \emph{"MH"}
+and \emph{"SLICE"} for Metropolis_Hastings and Slice sampling respectively.
 }
   \item{burnin}{
 The burnin period for the monte-carlo simulation. These are discarded from the returned samples.
@@ -40,58 +37,57 @@ The total number of samples returned is \emph{iter - burnin}
   \item{nchains}{
 The number of independent chains to run.
 }
-  \item{theta_algorithm}{
-MCMC algorithm used to sample the theta variables. "MH" is the only currently supported stable algorithm.
-}
-  \item{sim_type}{
-The type of MCMC method to use for simulating from non-standard distributions apart from theta. Allowed values are \emph{"MH"} and \emph{"SLICE"} for Metropolis_Hastings and Slice sampling respectively.
-}
-
-\item{monitor}{
-A dataframe indicating which sets of variables to monitor.
-}
-
 \item{global.sim.params}{
 A data frame containing the parameters for the simulation type \emph{sim_type}. For \emph{"MH"} the parameter
 is the variance of the normal distribution used to simulate the next candidate value centred on the current
 value. For \emph{"SLICE"} the parameters are the estimated width of the slice and a value limiting the search for the next sample.
+Passing NULL uses the model defaults.
 }
 \item{sim.params}{
 A dataframe containing simulation parameters which override the global simulation parameters (\emph{global.sim.params}) for particular model
 parameters. \emph{sim.params} must contain the following columns: type: the simulation type ("MH" or "SLICE"); variable: the model parameter 
 for which the simulation parameters are being overridden; B: the body-system (if applicable); AE: the adverse event (if applicable);
 param: the simulation parameter; value: the overridden value; control: the overridden control value.
+Passing NULL uses the model defaults.
 
 The function \emph{c212.sim.control.params} generates a template for \emph{sim.params} which can be edited by the user.
 }
-\item{initial_values}{
+
+\item{monitor}{
+A dataframe indicating which sets of If NULL is passed default parameters are variables to monitor.
+Passing NULL uses the model defaults.
+}
+
+  \item{initial_values}{
 The initial values for starting the chains. If NULL (the default) is passed the function generates the initial
 values for the chains. initial_values is a list with the following format:
 \preformatted{
 list(gamma, theta, mu.gamma, mu.theta, sigma2.gamma,
-	sigma2.theta, pi, mu.gamma.0, mu.theta.0,
-	tau2.gamma.0, tau2.theta.0, alpha.pi, beta.pi)
+	sigma2.theta, mu.gamma.0, mu.theta.0, tau2.gamma.0,
+	tau2.theta.0)
 }
+where each element of the list is either a dataframe or array.
 The function \emph{c212.gen.initial.values} can be used to generate a template for the list which can be updated by the user if required.
 The formats of the list elements are as follows:
 
 \emph{gamma, theta}: dataframe with columns \emph{B}, \emph{AE}, \emph{chain}, \emph{value}
 
-\emph{mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, pi}: dataframe with columns \emph{B}, \emph{chain}, \emph{value}
+\emph{mu.gamma, mu.theta, sigma2.gamma, sigma2.theta}: dataframe with columns \emph{B}, \emph{chain}, \emph{value}
 
+\emph{mu.gamma.0, mu.theta.0, tau2.gamma.0, tau2.theta.0}: array of size \emph{chain}.
 }
-  \item{level}{
-Allowed values are 0, 1. Respectively these indicate independent intervals, common body-system means across the intervals.
+
+\item{hier}{
+Model using a two or three level hierarchy. 2 - two-level hierarchy, 3 - three level hierarchy.
+}
+
+\item{level}{
+The level of longitudinal dependency between the intervals. Allowed values are 0, 1, 2 for a three-level hierarchy and 0, 1 for a two-level hierarchy.
+0 - independent intervals, 1 - common interval body-system means, 2 - weak dependency.
 }
   \item{hyper_params}{
-The hyperparameters for the model. The default hyperparameters are those given in Berry and Berry 2004.
-}
-
-\item{global.pm.weight}{A global weighting for the proposal distribution used to sample theta.}
-\item{pm.weights}{Override global.pm.weight for specific adverse events.}
-
-  \item{adapt_phase}{
-Unused parameter.
+The hyperparameters for the model. The default hyperparameters are based on those given in Berry and Berry 2004.
+Passing NULL uses the model defaults.
 }
 
 \item{memory_model}{
@@ -99,27 +95,34 @@ Allowed values are "HIGH" and "LOW". "HIGH" means use as much memory as possible
 }
 }
 \details{
-The model is fitted by a Gibbs sampler. The details of the complete conditional densities are given in Berry
-and Berry (2004).
+The models are fitted by Gibbs samplers.
+The posterior distributions for \emph{gamma} and \emph{theta} are sampled with either a Metropolis-Hastings step or a slice sampler.
 }
 \value{
-The output from the simulation including all the sampled values is as follows:
+The output from the simulation including all the sampled values for the three-level hierarchy is as follows:
 \preformatted{
-list(id, theta_alg, sim_type, chains, nIntervals, Intervals, nBodySys,
-	maxBs, maxAEs, nAE, AE, B, burnin,
-	iter, monitor,
-	mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, pi,
-	gamma, theta, gamma_acc, theta_acc)
+list(id, sim_type, chains, nIntervals, Intervals, nBodySys, maxBs,
+	maxAEs, nAE, AE, B, burnin, iter, monitor,
+	mu.gamma.0, mu.theta.0, tau2.gamma.0, tau2.theta.0,
+	mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, gamma,
+	theta, gamma_acc, theta_acc)
 }
+
+The output from the simulation including all the sampled values for the two-level hierarchy is as follows:
+\preformatted{
+list(id, sim_type, chains, nIntervals, Intervals, nBodySys, maxBs,
+	maxAEs, nAE, AE, B, burnin, iter, monitor,
+	mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, gamma,
+	theta, gamma_acc, theta_acc)
+}
+
 where
 
 \emph{id} - a string identifying the version of the function
 
-\emph{theta_alg} - an string identifying the algorithm used to sample theta
-
 \emph{sim_type} - an string identifying the sampling method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
 
-\emph{chains} - the number of chains for which the simulation was run
+\emph{chains} - the number of chains for which the simulation was run.
 
 \emph{nIntervals} - the number of intervals in the simulation
 
@@ -143,6 +146,14 @@ where
 
 \emph{monitor} - the variables being monitored. A dataframe.
 
+\emph{mu.gamma.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{mu.theta.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{tau2.gamma.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{tau2.theta.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
 \emph{mu.gamma} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
 
 \emph{mu.theta} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
@@ -151,16 +162,13 @@ where
 
 \emph{sigma2.theta} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
 
-\emph{pi} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
-
 \emph{gamma} - array of samples of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}, \emph{iter - burnin}
 
 \emph{theta} - array of samples of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}, \emph{iter - burnin}
 
 \emph{gamma_acc} - the acceptance rate for the gamma samples if a Metropolis-Hastings method is used. An array of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}
 
-\emph{theta_acc} - the acceptance rate for the theta samples. An array of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}
-
+\emph{theta_acc} - the acceptance rate for the theta samples if a Metropolis-Hastings method is used. An array of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}
 }
 %\references{
 %S. M. Berry and D. A. Berry (2004). Accounting for multiplicities in assessing drug safety: a three-
@@ -178,14 +186,13 @@ The function performs the simulation and returns the raw output. No checks for c
 
 \examples{
 data(c212.trial.interval.data1)
-raw = c212.interim.1a.hier2(c212.trial.interval.data1, level = 1, burnin = 100, iter = 200)
-
+raw = c212.1a.interim(c212.trial.interval.data1, burnin = 100, iter = 200)
 \dontrun{
 data(c212.trial.interval.data1)
-raw = c212.interim.1a.hier2(c212.trial.interval.data1, level = 1)
+raw = c212.1a.interim(c212.trial.interval.data1)
 
 raw$B
-     [,1]        [,2]         [,3]         [,4]         [,5]        
+    [,1]        [,2]         [,3]         [,4]         [,5]        
 [1,] "Bdy-sys_1" "Bdy-sys_10" "Bdy-sys_11" "Bdy-sys_12" "Bdy-sys_13"
 [2,] "Bdy-sys_1" "Bdy-sys_10" "Bdy-sys_11" "Bdy-sys_12" "Bdy-sys_13"
 [3,] "Bdy-sys_1" "Bdy-sys_10" "Bdy-sys_11" "Bdy-sys_12" "Bdy-sys_13"
@@ -206,13 +213,11 @@ raw$B
 [4,] "Bdy-sys_6" "Bdy-sys_7" "Bdy-sys_8" "Bdy-sys_9"
 [5,] "Bdy-sys_6" "Bdy-sys_7" "Bdy-sys_8" "Bdy-sys_9"
 [6,] "Bdy-sys_6" "Bdy-sys_7" "Bdy-sys_8" "Bdy-sys_9"
-
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{c212.interim.BB.hier2}
+\keyword{c212.1a.interim}
 \keyword{Bayesian} % __ONLY ONE__ keyword per line
 \keyword{Hierarchy} % __ONLY ONE__ keyword per line
-\keyword{Point-mass} % __ONLY ONE__ keyword per line
 \keyword{Berry and Berry} % __ONLY ONE__ keyword per line

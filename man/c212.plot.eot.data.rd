@@ -35,7 +35,7 @@ Nothing is returned.
 R. Carragher
 }
 \note{
-The legend may obscure a portion of the graph. In this case the legend may be supressed by choosing \emph{legend = FALSE} when calling the function.
+The legend may obscure a portion of the graph. In this case the legend may be suppressed by choosing \emph{legend = FALSE} when calling the function.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

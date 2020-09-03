@@ -1,26 +1,19 @@
-\name{c212.interim.BB.hier2}
-\alias{c212.interim.BB.hier2}
+\name{c212.BB.interim}
+\alias{c212.BB.interim}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{A Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
+\title{A Two or Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
 \description{
-Implementation of a Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
+Implementation of a Two or Three-Level Hierarchical Body-system based Model for interim analysis with Point-Mass.}
 \usage{
-	c212.interim.BB.hier2(trial.data, sim_type = "SLICE", burnin = 20000,
+	c212.BB.interim(trial.data, sim_type = "SLICE", burnin = 20000,
 	iter = 60000, nchains = 5, theta_algorithm = "MH",
-	global.sim.params = data.frame(type = c("MH", "MH", "MH", "MH",
-	"SLICE", "SLICE", "SLICE"),
-	param = c("sigma_MH_alpha", "sigma_MH_beta", "sigma_MH_gamma",
-	"sigma_MH_theta", "w_alpha", "w_beta", "w_gamma"),
-	value = c(3, 3, 0.2, 0.5, 1, 1, 1), control = c(0, 0, 0, 0, 6, 6, 6),
-	stringsAsFactors = FALSE),
+	global.sim.params = NULL,
 	sim.params = NULL,
-	monitor = data.frame(variable = c("theta", "gamma", "mu.gamma",
-	"mu.theta", "sigma2.theta", "sigma2.gamma", "pi"),
-	monitor = c(1, 1, 1, 1, 1, 1, 1), stringsAsFactors = FALSE),
-	initial_values = NULL, level = 1,
-	hyper_params = list(mu.gamma.0 = 0, tau2.gamma.0 = 10, mu.theta.0 = 0,
-	tau2.theta.0 = 10, alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
-	beta.theta = 1, alpha.pi = 1.1, beta.pi = 1.1),
+	monitor = NULL,
+	initial_values = NULL,
+	hier = 3,
+	level = 1,
+	hyper_params = NULL,
 	global.pm.weight = 0.5,
 	pm.weights = NULL,
 	adapt_phase=1, memory_model = "HIGH")
@@ -49,12 +42,14 @@ The type of MCMC method to use for simulating from non-standard distributions ap
 
 \item{monitor}{
 A dataframe indicating which sets of variables to monitor.
+Passing NULL uses the model defaults.
 }
 
 \item{global.sim.params}{
 A data frame containing the parameters for the simulation type \emph{sim_type}. For \emph{"MH"} the parameter
 is the variance of the normal distribution used to simulate the next candidate value centred on the current
 value. For \emph{"SLICE"} the parameters are the estimated width of the slice and a value limiting the search for the next sample.
+Passing NULL uses the model defaults.
 }
 \item{sim.params}{
 A dataframe containing simulation parameters which override the global simulation parameters (\emph{global.sim.params}) for particular model
@@ -79,12 +74,20 @@ The formats of the list elements are as follows:
 
 \emph{mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, pi}: dataframe with columns \emph{B}, \emph{chain}, \emph{value}
 
+\emph{mu.gamma.0, mu.theta.0, tau2.gamma.0, tau2.theta.0, alpha.pi, beta.pi}: array of size \emph{chain}.
+
+}
+
+\item{hier}{
+Model using a two or three level hierarchy. 2 - two-level hierarchy, 3 - three level hierarchy.
 }
   \item{level}{
-Allowed values are 0, 1. Respectively these indicate independent intervals, common body-system means across the intervals.
+The level of longitudinal dependency between the intervals. Allowed values are 0, 1, 2 for a three-level hierarchy and 0, 1 for a two-level hierarchy.
+0 - independent intervals, 1 - common interval body-system means, 2 - weak dependency.
 }
   \item{hyper_params}{
 The hyperparameters for the model. The default hyperparameters are those given in Berry and Berry 2004.
+Passing NULL uses the model defaults.
 }
 
 \item{global.pm.weight}{A global weighting for the proposal distribution used to sample theta.}
@@ -103,19 +106,27 @@ The model is fitted by a Gibbs sampler. The details of the complete conditional 
 and Berry (2004).
 }
 \value{
-The output from the simulation including all the sampled values is as follows:
+The output from the simulation including all the sampled values for the three-level hierarchy is as follows:
 \preformatted{
-list(id, theta_alg, sim_type, chains, nIntervals, Intervals, nBodySys,
+list(id, sim_type, chains, nIntervals, Intervals, nBodySys,
+	maxBs, maxAEs, nAE, AE, B, burnin,
+	iter, monitor, mu.gamma.0, mu.theta.0, tau2.gamma.0, tau2.theta.0,
+	gamma, theta,  mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, pi,
+	alpha.pi, beta.pi,
+	alpha.pi_acc, beta.pi_acc, gamma_acc, theta_acc)
+}
+The output from the simulation including all the sampled values for the two-level hierarchy is as follows:
+\preformatted{
+list(id, sim_type, chains, nIntervals, Intervals, nBodySys,
 	maxBs, maxAEs, nAE, AE, B, burnin,
 	iter, monitor,
+	gamma, theta,
 	mu.gamma, mu.theta, sigma2.gamma, sigma2.theta, pi,
-	gamma, theta, gamma_acc, theta_acc)
+	gamma_acc, theta_acc)
 }
 where
 
 \emph{id} - a string identifying the version of the function
-
-\emph{theta_alg} - an string identifying the algorithm used to sample theta
 
 \emph{sim_type} - an string identifying the sampling method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
 
@@ -143,6 +154,14 @@ where
 
 \emph{monitor} - the variables being monitored. A dataframe.
 
+\emph{mu.gamma.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{mu.theta.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{tau2.gamma.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{tau2.theta.0} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
 \emph{mu.gamma} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
 
 \emph{mu.theta} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
@@ -152,6 +171,13 @@ where
 \emph{sigma2.theta} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
 
 \emph{pi} - array of samples of dimension \emph{chains}, \emph{nBodySys} \emph{iter - burnin}
+\emph{alpha.pi} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+\emph{beta.pi} - array of samples of dimension \emph{chains}, \emph{iter - burnin}
+
+\emph{alpha.pi_acc} - the acceptance rate for the alpha.pi samples if a Metropolis-Hastings method is used. An array of dimension \emph{chains}, \emph{maxAEs}
+
+\emph{beta.pi_acc} - the acceptance rate for the beta.pi samples if a Metropolis-Hastings method is used. An array of dimension \emph{chains}, \emph{maxAEs}
+
 
 \emph{gamma} - array of samples of dimension \emph{chains}, \emph{nBodySys}, \emph{maxAEs}, \emph{iter - burnin}
 
@@ -178,11 +204,11 @@ The function performs the simulation and returns the raw output. No checks for c
 
 \examples{
 data(c212.trial.interval.data1)
-raw = c212.interim.1a.hier2(c212.trial.interval.data1, level = 1, burnin = 100, iter = 200)
+raw = c212.BB.interim(c212.trial.interval.data1, level = 1, burnin = 100, iter = 200)
 
 \dontrun{
 data(c212.trial.interval.data1)
-raw = c212.interim.1a.hier2(c212.trial.interval.data1, level = 1)
+raw = c212.BB.interim(c212.trial.interval.data1, level = 1)
 
 raw$B
      [,1]        [,2]         [,3]         [,4]         [,5]        
@@ -211,7 +237,7 @@ raw$B
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{c212.interim.BB.hier2}
+\keyword{c212.BB.interim}
 \keyword{Bayesian} % __ONLY ONE__ keyword per line
 \keyword{Hierarchy} % __ONLY ONE__ keyword per line
 \keyword{Point-mass} % __ONLY ONE__ keyword per line

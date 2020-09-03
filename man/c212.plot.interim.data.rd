@@ -14,7 +14,7 @@ This function plots a graph of the count of adverse events which have occurred i
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{trial.data}{
-A file or data frame containing the trial data. The data frame must contain the columns \emph{I_index} (interval), \emph{B} (body-system), \emph{AE} (adverse event), \emph{Group} (1 - control, 2 treatment), \emph{Count} (total number of events), \emph{Exposure} (total time of participants speant in the interval).
+A file or data frame containing the trial data. The data frame must contain the columns \emph{I_index} (interval), \emph{B} (body-system), \emph{AE} (adverse event), \emph{Group} (1 - control, 2 treatment), \emph{Count} (total number of events), \emph{Exposure} (total time of participants spent in the interval).
 }
   \item{body_sys}{
 The body-system for which to plot the events.

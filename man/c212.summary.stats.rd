@@ -6,7 +6,7 @@
 Returns the Summary Statistics for the Posterior Distributions in the model.
 }
 \details{
-The function reports the mean, upper and lower bounds of the 95% HPI (higest probabily interval), the 
+The function reports the mean, upper and lower bounds of the 95% HPI (highest probability interval), the 
 standard deviation and MCMC standard error.
 }
 \usage{
@@ -30,7 +30,7 @@ list(theta.summary, gamma.summary, mu.gamma.summary,
 								mu.gamma.0.summary, mu.theta.0.summary,
 								tau2.gamma.0.summary, tau2.theta.0.summary)
 }
-Additional columns which may be used to indentify the individual variables are \emph{B}, the body-system, and
+Additional columns which may be used to identify the individual variables are \emph{B}, the body-system, and
 \emph{AE}, the Adverse Event and \emph{interval}.
 }
 \note{
@@ -43,6 +43,9 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+summ = c212.summary.stats(raw)
 \dontrun{
 data(c212.trial.data)
 raw = c212.BB(c212.trial.data)

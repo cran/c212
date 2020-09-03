@@ -1,9 +1,9 @@
 \name{c212.interim.MLE}
 \alias{c212.interim.MLE}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Poisson Maximim Likelihood Estimator}
+\title{Poisson Maximum Likelihood Estimator}
 \description{
-Calculate the Poisson Maximim Likelihood Estimator for interim analysis data.
+Calculate the Poisson Maximum Likelihood Estimator for interim analysis data.
 }
 
 \usage{
@@ -33,6 +33,9 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.interval.data1)
+data <- c212.trial.interval.data1[ c212.trial.interval.data1$Interval == "0.0-180.0",]
+raw = c212.interim.MLE(data)
 \dontrun{
 data(c212.trial.interval.data1)
 raw = c212.interim.MLE(c212.trial.interval.data1)

@@ -31,9 +31,20 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+pmw <- c212.pointmass.weights(c212.trial.data)
+head(pmw)
 \dontrun{
 data(c212.trial.data)
-c212.pointmass.weights(c212.trial.data)
+pmw <- c212.pointmass.weights(c212.trial.data)
+head(pmw)
+          B        AE weight_pm
+1 Bdy-sys_2  Adv-Ev_5       0.5
+2 Bdy-sys_5 Adv-Ev_24       0.5
+3 Bdy-sys_6 Adv-Ev_31       0.5
+4 Bdy-sys_8 Adv-Ev_42       0.5
+5 Bdy-sys_7 Adv-Ev_39       0.5
+6 Bdy-sys_6 Adv-Ev_34       0.5
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

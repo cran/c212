@@ -65,13 +65,18 @@ R. Carragher
 %%450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450,
 %%450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450, 450))
 
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+p = c212.ptheta(raw)
+head(p)
+
 \dontrun{
 data(c212.trial.data)
 raw = c212.BB(c212.trial.data)
 }
 
 \dontrun{
-p = c212.BB.ptheta(rm)
+p = c212.ptheta(raw)
 
 head(p)
           B       AE    ptheta

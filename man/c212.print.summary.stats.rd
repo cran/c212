@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Print the Summary Statistics of Posterior Distributions}
 \description{
-The function prints the variable names, the mean, the 95% HPI interval, the standard distribtion and the
+The function prints the variable names, the mean, the 95% HPI interval, the standard deviation and the
 MCMC standard error for the simulated sample.}
 \usage{
 	c212.print.summary.stats(summ)
@@ -11,7 +11,7 @@ MCMC standard error for the simulated sample.}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{summ}{
-The output from a call to c212.summary.stats
+The output from a call to \emph{c212.summary.stats}.
 }
 }
 \value{
@@ -24,8 +24,14 @@ R. Carragher
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+summ = c212.summary.stats(raw)
+c212.print.summary.stats(summ)
 \dontrun{
-summ = c212.summary.stats(rm)
+data(c212.trial.data)
+raw = c212.BB(c212.trial.data, burnin = 100, iter = 200)
+summ = c212.summary.stats(raw)
 c212.print.summary.stats(summ)
 }
 }

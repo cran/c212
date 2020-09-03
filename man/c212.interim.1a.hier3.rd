@@ -34,7 +34,7 @@ arm).
 }
   \item{sim_type}{
 The type of MCMC method to use for simulating from non-standard distributions. Allowed values are \emph{"MH"}
-and \emph{"SLICE"} for Metropis_Hastings and Slice sampling respectively.
+and \emph{"SLICE"} for Metropolis_Hastings and Slice sampling respectively.
 }
   \item{burnin}{
 The burnin period for the monte-carlo simulation. These are discarded from the returned samples.
@@ -47,7 +47,7 @@ The total number of samples returned is \emph{iter - burnin}
 The number of independent chains to run.
 }
 \item{global.sim.params}{
-A data frame containing the parameters for the simuation type \emph{sim_type}. For \emph{"MH"} the parameter
+A data frame containing the parameters for the simulation type \emph{sim_type}. For \emph{"MH"} the parameter
 is the variance of the normal distribution used to simulate the next candidate value centred on the current
 value. For \emph{"SLICE"} the parameters are the estimated width of the slice and a value limiting the search for the next sample.
 }
@@ -84,11 +84,11 @@ The formats of the list elements are as follows:
 }
 
 \item{level}{
-The level of longitudinal dependancy between the intervals. 0 - independent intervals, 1 - common interva body-system means, 2 - weak
-dependancy.
+The level of longitudinal dependency between the intervals. 0 - independent intervals, 1 - common interval body-system means, 2 - weak
+dependency.
 }
   \item{hyper_params}{
-The hyperparameters for the model. The default hyperparamters are those given in Berry and Berry 2004.
+The hyperparameters for the model. The default hyperparameters are those given in Berry and Berry 2004.
 }
 
 \item{memory_model}{
@@ -110,9 +110,9 @@ list(id, sim_type, chains, nIntervals, Intervals, nBodySys, maxBs,
 }
 where
 
-\emph{id} - a string identifying the verion of the function
+\emph{id} - a string identifying the version of the function
 
-\emph{sim_type} - an string identifying the samlping method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
+\emph{sim_type} - an string identifying the sampling method used for non-standard distributions, either \emph{"MH"} or \emph{"SLICE"}
 
 \emph{chains} - the number of chains for which the simulation was run.
 
@@ -177,6 +177,8 @@ The function performs the simulation and returns the raw output. No checks for c
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
+data(c212.trial.interval.data1)
+raw = c212.interim.1a.hier3(c212.trial.interval.data1, level = 1, burnin = 100, iter = 200)
 \dontrun{
 data(c212.trial.interval.data1)
 raw = c212.interim.1a.hier3(c212.trial.interval.data1, level = 1)

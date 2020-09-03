@@ -14,6 +14,7 @@ export(c212.1a)
 export(c212.BB)
 
 # c212.FDR
+export(c212.err.cntrl)
 export(c212.BH)
 #export(c212.FDR_adjusted_p_vals)
 export(c212.BH.adjust.pvals)
@@ -41,6 +42,8 @@ export(c212.fisher.test)
 export(c212.bin.test)
 
 # Interim Analyses
+export(c212.1a.interim)
+export(c212.BB.interim)
 export(c212.interim.1a.hier2)
 export(c212.interim.BB.hier2)
 export(c212.interim.1a.hier3)
@@ -51,6 +54,8 @@ export(c212.monitor.samples)
 export(c212.pointmass.weights)
 export(c212.sim.control.params)
 export(c212.gen.initial.values)
+export(c212.global.sim.params)
+export(c212.hyper.params)
 
 # experimental
 #export(c212.BB.convergence.diag_new)

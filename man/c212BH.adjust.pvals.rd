@@ -93,5 +93,5 @@ adj[adj$p_adj <= 0.05, ]
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{c212.BH.adjust.pvals}
-\keyword{BH adjustied p-values}
-\keyword{Benjamini-Hochberg adjustied p-values}
+\keyword{BH adjusted p-values}
+\keyword{Benjamini-Hochberg adjusted p-values}

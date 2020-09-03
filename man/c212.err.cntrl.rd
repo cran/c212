@@ -1,14 +1,14 @@
-\name{c212.GBH}
-\alias{c212.GBH}
+\name{c212.err.cntrl}
+\alias{c212.err.cntrl}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Implementaion of Group Bonferroni-Hochberg procedure for control of the False Discovery Rate}
 \description{
-The Group Benjamini-Hochberg procedure for control of the False Discovery Rate is designed to take advantage of possible groupings which may exist within 
-sets of hypotheses. The procedure estimates the number of true null hypotheses in each grouping and uses this to weight the p-values which are then compared to a weighted level for control. The procedure asymptotically
-controls the False Discovery Rate at the required level.
+Common interface to the error controlling methods: Unadjutsed hypothesis testing (NOADJ), Bonferroni correction (BONF), Benjamini-Hochberg procedure (BH),
+Group Benjamini-Hochberg (GBH),
+Double False Discover Rate (DFDR), subset Benjamini-Hochberg (ssBH).
 }
 \usage{
-c212.GBH(trial.data, pi0 = "TST", alpha)
+c212.err.cntrl(trial.data, alpha = 0.05, method = "NOADJ",...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,33 +16,27 @@ c212.GBH(trial.data, pi0 = "TST", alpha)
 File or data frame containing the p-values for the hypotheses being tested. 
 The data must contain the following columns: \emph{B}: the index or name of the groupings; \emph{p}: the p-values of the hypotheses.
 }
-\item{pi0}{
-The estimator to use for the estimation of the number of true null hypotheses in each group. Valid values are
-\emph{"TST"} and \emph{"LSL"}.
-}
 \item{alpha}{
-The level for FDR control. E.g. 0.05.
+The level for error control. E.g. 0.05.
+}
+\item{method}{
+The error control procedure to be applied:
+"NOAD" - unadjusted testing,
+"BONF" - Bonferroni correction
+"BH" -  Benjamini-Hochberg procedure
+"GBH" - Group Benjamini-Hochberg
+"DFDR" - Double False Discover Rate
+"ssBH" - subset Benjamini-Hochberg.
+}
+\item{...}{
+Additional optional parameter for the GBH method: \emph{pi0}. 
 }
 }
 \value{
 The subset of hypotheses in \emph{file} or \emph{trial.data} deemed significant by the Group Benjamini-Hochberg process.
 }
-\references{
-Hu, J. X. and Zhao, H. and Zhou, H. H. (2010). False Discovery Rate Control With Groups. J Am Stat Assoc, 105(491):1215-1227.
-
-Y. Benjamini, A. M. Krieger, and D. Yekutieli (2006). Adaptive linear step-up procedures that
-control the false discovery rate. Biometrika, 93(3):491–507.
-
-Benjamini Y, Hochberg Y. (2000). On the Adaptive Control of the False Discovery Rate in Multiple Testing
-With Independent Statistics. Journal of Educational and Behavioral Statistics, 25(1):60–83.
-
-}
 \author{
 R. Carragher
-}
-\note{
-The estimator "\emph{TST}" is the two-stage estimator of Benjamini, Krieger, and Yekutieli. 
-The estimator  "\emph{LSL}" is the least-slope estimator of Benjamini and Hochberg.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -56,7 +50,7 @@ p = c(0.135005, 0.010000, 0.001000, 0.005000, 0.153501, 0.020000, 0.0013, 0.0023
 0.011, 0.023000, 0.016, 0.0109, 0.559111, 0.751986, 0.308339, 0.837154, 0.325882))
 
 
-c212.GBH(trial.data, pi0 = "TST", 0.05)
+c212.err.cntrl(trial.data = trial.data, alpha = 0.05, method = "GBH")
 
 \dontrun{
    B j   AE        p   p_weighted
@@ -75,5 +69,9 @@ c212.GBH(trial.data, pi0 = "TST", 0.05)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{c212.GBH}
+\keyword{c212.err.cntrl}
+\keyword{BONF}
+\keyword{BH}
 \keyword{GBH}
+\keyword{DFDR}
+\keyword{ssBH}

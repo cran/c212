@@ -1,3 +1,10 @@
+# c212
+# Default params
+# R. Carragher
+# Date: 20/08/2020
+
+Id <- "$Id: c212.params.R,v 1.4 2020/08/31 10:03:45 clb13102 Exp clb13102 $"
+
 c212.sim.control.params = function(trial.data, model = "1a") {
 
 	if (model == "1a") {
@@ -223,3 +230,200 @@ c212.BB.sim.control.params = function(trial.data) {
 	sim_params
 }
 
+c212.global.sim.params <- function(trial.data, model = "BB", hier = 3) {
+
+	if (is.null(model)) {
+		return(NULL)
+	}
+
+	global.sim.params <- NULL
+
+	if (model == "1a") {
+		global.sim.params <- c212.1a.global.sim.params(trial.data, hier)
+	}
+	else if (model == "BB") {
+		global.sim.params <- c212.BB.global.sim.params(trial.data, hier)
+	}
+
+	global.sim.params
+}
+
+c212.1a.global.sim.params <- function(trial.data, hier = 3) {
+
+	if (is.character(trial.data)) {
+		file = trial.data
+		trial.data <- read.table(file, header=TRUE, stringsAsFactors = FALSE)
+    }
+
+	if (is.null(trial.data)) {
+		return(NULL)
+	}
+
+	global.sim.params <- NULL
+
+	if ("Interval" %in% names(trial.data)) {
+		global.sim.params = data.frame(type = c("MH", "SLICE"),
+							param = c("sigma_MH", "w"),
+                           	value = c(0.2,1),
+							control = c(0,6), stringsAsFactors = FALSE)
+	}
+	else {
+		#EOT 1a
+		global.sim.params = data.frame(type = c("MH", "SLICE"),
+							param = c("sigma_MH", "w"),
+							value = c(0.35,1),
+							control = c(0,6), stringsAsFactors = FALSE)
+	}
+
+	global.sim.params
+}
+
+c212.BB.global.sim.params <- function(trial.data, hier = 3) {
+
+	if (is.character(trial.data)) {
+		file = trial.data
+		trial.data <- read.table(file, header=TRUE, stringsAsFactors = FALSE)
+    }
+
+	if (is.null(trial.data)) {
+		return(NULL)
+	}
+
+
+	global.sim.params <- NULL
+
+	if ("Interval" %in% names(trial.data)) {
+		if (hier == 3) {
+			global.sim.params = data.frame(type = c("MH", "MH", "MH", "MH",
+					"SLICE", "SLICE", "SLICE"),
+                    param = c("sigma_MH_alpha", "sigma_MH_beta",
+								"sigma_MH_gamma", "sigma_MH_theta",
+								"w_alpha", "w_beta", "w_gamma"),
+					value = c(3, 3, 0.2, 0.25, 1, 1, 1),
+					control = c(0, 0, 0, 0, 6, 6, 6),
+					stringsAsFactors = FALSE)
+		}
+		else if (hier == 2) {
+			global.sim.params = data.frame(type = c("MH", "MH", "MH", "MH",
+					"SLICE", "SLICE", "SLICE"),
+					param = c("sigma_MH_alpha", "sigma_MH_beta",
+								"sigma_MH_gamma", "sigma_MH_theta",
+								"w_alpha", "w_beta", "w_gamma"),
+					value = c(3, 3, 0.2, 0.5, 1, 1, 1),
+					control = c(0, 0, 0, 0, 6, 6, 6),
+					stringsAsFactors = FALSE)
+
+		}
+	}
+	else {
+		# EOT BB
+		global.sim.params = data.frame(type = c("MH", "MH", "MH", "MH",
+								"SLICE", "SLICE", "SLICE"),
+								param = c("sigma_MH_alpha", "sigma_MH_beta",
+								 "sigma_MH_gamma", "sigma_MH_theta",
+								"w_alpha", "w_beta", "w_gamma"),
+								value = c(3, 3, 0.2, 0.2, 1, 1, 1),
+								control = c(0, 0, 0, 0, 6, 6, 6),
+								stringsAsFactors = FALSE)
+	}
+
+	global.sim.params
+}
+
+c212.hyper.params <- function(trial.data, model = "BB", hier = 3) {
+
+	if (is.null(model)) {
+		return(NULL)
+	}
+
+	hyper_params <- NULL
+
+	if (model == "1a") {
+		hyper_params <- c212.1a.hyper.params(trial.data, hier)
+	}
+	else if (model == "BB") {
+		hyper_params <- c212.BB.hyper.params(trial.data, hier)
+	}
+
+	hyper_params
+}
+
+c212.1a.hyper.params <- function(trial.data, hier = 3) {
+
+	if (is.character(trial.data)) {
+		file = trial.data
+		trial.data <- read.table(file, header=TRUE, stringsAsFactors = FALSE)
+	}
+
+	if (is.null(trial.data)) {
+		return(NULL)
+	}
+
+	hyper_params <- NULL
+
+	if ("Interval" %in% names(trial.data)) {
+		if (hier == 3) {
+			hyper_params = list(mu.gamma.0.0 = 0, tau2.gamma.0.0 = 10,
+				mu.theta.0.0 = 0, tau2.theta.0.0 = 10, alpha.gamma.0.0 = 3,
+				beta.gamma.0.0 = 1, alpha.theta.0.0 = 3, beta.theta.0.0 = 1,
+				alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
+				beta.theta = 1)
+		}
+		else if (hier == 2) {
+			 hyper_params = list(mu.gamma.0 = 0, tau2.gamma.0 = 10,
+				mu.theta.0 = 0, tau2.theta.0 = 10, alpha.gamma = 3,
+				beta.gamma = 1,
+				alpha.theta = 3, beta.theta = 1)
+		}
+	}
+	else {
+		#EOT 1a
+		hyper_params = list(mu.gamma.0.0 = 0, tau2.gamma.0.0 = 10,
+			mu.theta.0.0 = 0, tau2.theta.0.0 = 10, alpha.gamma.0.0 = 3,
+			beta.gamma.0.0 = 1, alpha.theta.0.0 = 3, beta.theta.0.0 = 1,
+			alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
+			beta.theta = 1)
+	}
+
+	hyper_params
+}
+
+c212.BB.hyper.params <- function(trial.data, hier = 3) {
+
+	if (is.character(trial.data)) {
+		file = trial.data
+		trial.data <- read.table(file, header=TRUE, stringsAsFactors = FALSE)
+	}
+
+	if (is.null(trial.data)) {
+		return(NULL)
+	}
+
+	hyper_params <- NULL
+
+	if ("Interval" %in% names(trial.data)) {
+		if (hier == 3) {
+			 hyper_params = list(mu.gamma.0.0 = 0, tau2.gamma.0.0 = 10,
+				mu.theta.0.0 = 0, tau2.theta.0.0 = 10, alpha.gamma.0.0 = 3,
+				beta.gamma.0.0 = 1, alpha.theta.0.0 = 3, beta.theta.0.0 = 1,
+				alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
+				beta.theta = 1, lambda.alpha = 1.0, lambda.beta = 1.0)
+		}
+		else if (hier == 2) {
+			hyper_params = list(mu.gamma.0 = 0, tau2.gamma.0 = 10,
+				mu.theta.0 = 0, tau2.theta.0 = 10, alpha.gamma = 3,
+				beta.gamma = 1, alpha.theta = 3,
+				beta.theta = 1, alpha.pi = 1.1, beta.pi = 1.1)
+		}
+	}
+	else {
+		# EOT BB
+		hyper_params = list(mu.gamma.0.0 = 0, tau2.gamma.0.0 = 10,
+				mu.theta.0.0 = 0, tau2.theta.0.0 = 10, alpha.gamma.0.0 = 3,
+				beta.gamma.0.0 = 1, alpha.theta.0.0 = 3, beta.theta.0.0 = 1,
+				alpha.gamma = 3, beta.gamma = 1, alpha.theta = 3,
+				beta.theta = 1, lambda.alpha = 1.0, lambda.beta = 1.0)
+	}
+
+	hyper_params
+}
