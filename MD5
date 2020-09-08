@@ -1,4 +1,4 @@
-2586f47f0d25ffd5a82eaba0c6a9f653 *DESCRIPTION
+7e795309bc7f0948c539dd1fa1f9e826 *DESCRIPTION
 716becda5fbd5e30c9d372a1f43f7954 *NAMESPACE
 ed8e973e95629371c43bd618da650278 *R/c212.1a.R
 a464977df4237ebe207705fd8fa84ee9 *R/c212.1a.interim.R
@@ -110,7 +110,7 @@ a257abc2bbf682ea95c5da7efd03d20f *man/c212LSL.rd
 a4cc008a83ab0466c311ca8d73ec99fb *man/c212NOADJ.rd
 af684ea04abeb9823e7b37c7d5e424f2 *man/c212TST.rd
 29ea823d0e4aa9f7e8b0bc9498e4338a *man/c212ssBH.rd
-c70e0e84635d412351d61c7be9787b08 *src/c2121a.cpp
+f552de17711d61c7934ffb993c5ec188 *src/c2121a.cpp
 ef4f4d2f9acbce7017c246b6da97a970 *src/c2121a.h
 b620b378b171d08b75d76889a7e5064c *src/c2121a_poisson_mc_hier2_lev0.cpp
 0220f0cdc4334748da54f13517301204 *src/c2121a_poisson_mc_hier2_lev0.h

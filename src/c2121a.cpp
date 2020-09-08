@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c2121a.cpp,v 1.18 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
+static const char *rcsId = "$Id: c2121a.cpp,v 1.19 2020/09/04 12:49:13 clb13102 Exp clb13102 $";
 
 const char* c2121a::sColType = "type";
 const char* c2121a::sColVariable = "variable";
@@ -1686,7 +1686,7 @@ SEXP c2121a::getL1Accept(int*** &data)
 	for (c = 0; c < gChains; c++) {
 		int b = 0;
 		for (b = 0; b < gNumBodySys; b++) {
-			memcpy(INTEGER(acc) + i, data[c][b], gMaxAEs*sizeof(int));
+			memcpy(INTEGER(acc) + i, data[c][b], gNAE[b]*sizeof(int));
 			i += gMaxAEs;
 			free(data[c][b]);
 			data[c][b] = NULL;
