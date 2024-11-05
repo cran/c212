@@ -4,6 +4,8 @@
 #include <cstring>
 #include<cmath>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -17,7 +19,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev0.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c212BB_poisson_mc_hier3_lev0.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
 
 const char* c212BB_poisson_mc_hier3_lev0::sMonitor_pi = "pi";
 const char* c212BB_poisson_mc_hier3_lev0::sMonitor_alpha_pi = "alpha.pi";
@@ -193,9 +195,9 @@ void c212BB_poisson_mc_hier3_lev0::initPMWeights(SEXP pm_weights)
 	SEXP sB = R_NilValue;
 	SEXP sj = R_NilValue;
 
-	if (len && isNewList(pm_weights)) {
+	if (len && Rf_isNewList(pm_weights)) {
 
-		SEXP names = getAttrib(pm_weights, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(pm_weights, R_NamesSymbol);
 
 		for (i = 0; i < len; i++) {
 			if (strcmp(sColPMweight, CHAR(STRING_ELT(names, i))) == 0) {
@@ -277,7 +279,7 @@ void c212BB_poisson_mc_hier3_lev0::initSimParams(SEXP sSim_Params)
 
 	int len = Rf_length(sSim_Params);
 
-	if (len && isNewList(sSim_Params)) {
+	if (len && Rf_isNewList(sSim_Params)) {
 
 		SEXP sVariables = R_NilValue;
 		SEXP sParams = R_NilValue;
@@ -288,7 +290,7 @@ void c212BB_poisson_mc_hier3_lev0::initSimParams(SEXP sSim_Params)
 		//SEXP sIntervals = R_NilValue;
 		SEXP sI_index = R_NilValue;
 
-		SEXP names = getAttrib(sSim_Params, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(sSim_Params, R_NamesSymbol);
 
 		for (i = 0; i < len; i++) {
 			if (strcmp(sColValue, CHAR(STRING_ELT(names, i))) == 0) {
@@ -386,9 +388,9 @@ void c212BB_poisson_mc_hier3_lev0::initGlobalSimParams(SEXP sSim_Type, SEXP sGlo
 		gSimType = eSim_Type_SLICE;
 	}
 
-    if (len > 0 && isNewList(sGlobal_Sim_Params)) {
+    if (len > 0 && Rf_isNewList(sGlobal_Sim_Params)) {
 
-        SEXP names = getAttrib(sGlobal_Sim_Params, R_NamesSymbol);
+        SEXP names = Rf_getAttrib(sGlobal_Sim_Params, R_NamesSymbol);
 
         int i = 0;
 
@@ -912,9 +914,9 @@ void c212BB_poisson_mc_hier3_lev0::initMonitor(SEXP sMonitor)
     SEXP sVariables = R_NilValue;
     SEXP sValues = R_NilValue;
 
-    if (isNewList(sMonitor)) {
+    if (Rf_isNewList(sMonitor)) {
 
-        SEXP names = getAttrib(sMonitor, R_NamesSymbol);
+        SEXP names = Rf_getAttrib(sMonitor, R_NamesSymbol);
 
         int i = 0;
 
@@ -1753,7 +1755,7 @@ SEXP c212BB_poisson_mc_hier3_lev0::getL3Accept(int** &data)
 	SEXP acc = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(acc = allocVector(INTSXP, gChains * gNumIntervals));
+	PROTECT(acc = Rf_allocVector(INTSXP, gChains * gNumIntervals));
 
 	int i = 0;
 	int c = 0;
@@ -1773,12 +1775,12 @@ SEXP c212BB_poisson_mc_hier3_lev0::getL3Accept(int** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 2));
+	PROTECT(dim = Rf_allocVector(INTSXP, 2));
 
 	INTEGER(dim)[0] = gNumIntervals;
 	INTEGER(dim)[1] = gChains;
 
-	setAttrib(acc, R_DimSymbol, dim);
+	Rf_setAttrib(acc, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 

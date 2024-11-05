@@ -3,6 +3,8 @@
 
 #include<map>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -28,7 +30,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c212_exec.cpp,v 1.26 2018/09/21 10:30:19 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c212_exec.cpp,v 1.26 2018/09/21 10:30:19 clb13102 Exp clb13102 $";
 
 // These should really come from a common base class or be static within the class
 static c2121a* model = NULL;

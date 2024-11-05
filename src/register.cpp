@@ -1,5 +1,8 @@
 #include<cstdlib>
 #include<cstdio>
+
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
@@ -15,7 +18,7 @@
 // Register native methods with R (entry-points into compiled code)
 //
 
-static const char *rcsId = "$Id: register.cpp,v 1.2 2017/03/28 15:38:23 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: register.cpp,v 1.2 2017/03/28 15:38:23 clb13102 Exp clb13102 $";
 
 // .C methods
 static R_CMethodDef cMethods[] = {

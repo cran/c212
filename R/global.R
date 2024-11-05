@@ -155,8 +155,8 @@ M_global$sim_params1a <- function(M_env, sim.params, sim_type, trial.data, cntrl
 				names(params)[names(params) == "control.y"] = "control"
 				params <- params[order(params$B, params$AE),, drop=FALSE]
 
+				sim.params = params
 			}
-			sim.params = params
 
 			B = rep(1:M_env$NumBodySys)
 			B = rep(B, M_env$nAE)

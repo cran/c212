@@ -3,6 +3,8 @@
 #include <cstring>
 #include <cmath>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -14,7 +16,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev0.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev0.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
 
 const char* c2121a_poisson_mc_hier3_lev0::sMonitor_mu_theta_0 = "mu.theta.0";
 const char* c2121a_poisson_mc_hier3_lev0::sMonitor_mu_gamma_0 = "mu.gamma.0";
@@ -526,9 +528,9 @@ void c2121a_poisson_mc_hier3_lev0::initMonitor(SEXP sMonitor)
     SEXP sVariables = R_NilValue;
     SEXP sValues = R_NilValue;
 
-    if (len > 0 && isNewList(sMonitor)) {
+    if (len > 0 && Rf_isNewList(sMonitor)) {
 
-        SEXP names = getAttrib(sMonitor, R_NamesSymbol);
+        SEXP names = Rf_getAttrib(sMonitor, R_NamesSymbol);
 
         int i = 0;
 
@@ -993,7 +995,7 @@ SEXP c2121a_poisson_mc_hier3_lev0::getL3Samples(double*** &data)
 	SEXP samples = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(samples = allocVector(REALSXP, gChains * gNumIntervals * (gIter - gBurnin)));
+	PROTECT(samples = Rf_allocVector(REALSXP, gChains * gNumIntervals * (gIter - gBurnin)));
 
 	int i = 0;
 	int c = 0;
@@ -1012,13 +1014,13 @@ SEXP c2121a_poisson_mc_hier3_lev0::getL3Samples(double*** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 3));
+	PROTECT(dim = Rf_allocVector(INTSXP, 3));
 
 	INTEGER(dim)[0] = (gIter - gBurnin);
 	INTEGER(dim)[1] = gNumIntervals;
 	INTEGER(dim)[2] = gChains;
 
-	setAttrib(samples, R_DimSymbol, dim);
+	Rf_setAttrib(samples, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 

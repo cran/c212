@@ -624,8 +624,8 @@ c212.interim.BB.indep.print.convergence.summary <- function(conv) {
 		if (alpha_pi_mon == 1) {
 			cat("alpha.pi:\n")
 			cat("---------\n")
-			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$alpha.pi_acc$ratec),
-                                                max(conv$alpha.pi_acc$ratec)))
+			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$alpha.pi_acc$rate),
+                                                max(conv$alpha.pi_acc$rate)))
 		}
 
 		if (beta_pi_mon == 1) {

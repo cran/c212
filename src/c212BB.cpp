@@ -4,6 +4,8 @@
 
 #include<map>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -15,7 +17,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c212BB.cpp,v 1.19 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c212BB.cpp,v 1.19 2017/03/22 16:12:08 clb13102 Exp clb13102 $";
 
 const char* c212BB::sColPMweight = "weight_pm";
 
@@ -388,9 +390,9 @@ void c212BB::initGlobalSimParams(SEXP sim_type, SEXP sim_params)
 		gSimType = eSim_Type_SLICE;
 	}
 
-	if (isNewList(sim_params)) {
+	if (Rf_isNewList(sim_params)) {
 
-		SEXP names = getAttrib(sim_params, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(sim_params, R_NamesSymbol);
 
 		int i = 0;
 
@@ -508,9 +510,9 @@ void c212BB::initSimParams(SEXP sim_params)
 	SEXP sB = R_NilValue;
 	SEXP sj = R_NilValue;
 
-	if (len && isNewList(sim_params)) {
+	if (len && Rf_isNewList(sim_params)) {
 
-		SEXP names = getAttrib(sim_params, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(sim_params, R_NamesSymbol);
 
 		for (i = 0; i < len; i++) {
 			if (strcmp(sColValue, CHAR(STRING_ELT(names, i))) == 0) {
@@ -609,9 +611,9 @@ void c212BB::initPMWeights(SEXP pm_weights)
 	SEXP sB = R_NilValue;
 	SEXP sj = R_NilValue;
 
-	if (len && isNewList(pm_weights)) {
+	if (len && Rf_isNewList(pm_weights)) {
 
-		SEXP names = getAttrib(pm_weights, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(pm_weights, R_NamesSymbol);
 
 		for (i = 0; i < len; i++) {
 			if (strcmp(sColPMweight, CHAR(STRING_ELT(names, i))) == 0) {
@@ -2860,16 +2862,16 @@ SEXP c212BB::getL3Accept(int* &data)
 	SEXP acc = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(acc = allocVector(INTSXP, gChains));
+	PROTECT(acc = Rf_allocVector(INTSXP, gChains));
 	memcpy(INTEGER(acc), data, gChains*sizeof(int));
 
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 1));
+	PROTECT(dim = Rf_allocVector(INTSXP, 1));
 
 	INTEGER(dim)[0] = gChains;
-	setAttrib(acc, R_DimSymbol, dim);
+	Rf_setAttrib(acc, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 

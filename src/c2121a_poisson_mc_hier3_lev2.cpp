@@ -3,6 +3,8 @@
 #include <cstring>
 #include<cmath>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -16,7 +18,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev2.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c2121a_poisson_mc_hier3_lev2.cpp,v 1.17 2018/10/03 15:40:27 clb13102 Exp clb13102 $";
 
 c2121a_poisson_mc_hier3_lev2::c2121a_poisson_mc_hier3_lev2()
 {
@@ -618,7 +620,7 @@ SEXP c2121a_poisson_mc_hier3_lev2::getL3Samples(double** &data)
 	SEXP samples = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(samples = allocVector(REALSXP, gChains * (gIter - gBurnin)));
+	PROTECT(samples = Rf_allocVector(REALSXP, gChains * (gIter - gBurnin)));
 
 	int i = 0;
 	int c = 0;
@@ -632,12 +634,12 @@ SEXP c2121a_poisson_mc_hier3_lev2::getL3Samples(double** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 2));
+	PROTECT(dim = Rf_allocVector(INTSXP, 2));
 
 	INTEGER(dim)[0] = (gIter - gBurnin);
 	INTEGER(dim)[1] = gChains;
 
-	setAttrib(samples, R_DimSymbol, dim);
+	Rf_setAttrib(samples, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 

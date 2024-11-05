@@ -2,6 +2,8 @@
 #include<cstdlib>
 #include<cmath>
 
+#include "c212_Rdefines.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Print.h>
@@ -13,7 +15,7 @@
 
 using namespace std;
 
-static const char *rcsId = "$Id: c2121a.cpp,v 1.19 2020/09/04 12:49:13 clb13102 Exp clb13102 $";
+//static const char *rcsId = "$Id: c2121a.cpp,v 1.19 2020/09/04 12:49:13 clb13102 Exp clb13102 $";
 
 const char* c2121a::sColType = "type";
 const char* c2121a::sColVariable = "variable";
@@ -1114,9 +1116,9 @@ void c2121a::initSimParams(SEXP sim_params)
 	SEXP sB = R_NilValue;
 	SEXP sj = R_NilValue;
 
-	if (len && isNewList(sim_params)) {
+	if (len && Rf_isNewList(sim_params)) {
 
-		SEXP names = getAttrib(sim_params, R_NamesSymbol);
+		SEXP names = Rf_getAttrib(sim_params, R_NamesSymbol);
 
 		for (i = 0; i < len; i++) {
 			if (strcmp(sColValue, CHAR(STRING_ELT(names, i))) == 0) {
@@ -1533,7 +1535,7 @@ SEXP c2121a::getL1Samples(double**** &data)
 	SEXP samples = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(samples = allocVector(REALSXP, gChains * gNumBodySys * gMaxAEs * (gIter - gBurnin)));
+	PROTECT(samples = Rf_allocVector(REALSXP, gChains * gNumBodySys * gMaxAEs * (gIter - gBurnin)));
 
 	int i = 0;
 	int c = 0;
@@ -1558,14 +1560,14 @@ SEXP c2121a::getL1Samples(double**** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 4));
+	PROTECT(dim = Rf_allocVector(INTSXP, 4));
 
 	INTEGER(dim)[0] = (gIter - gBurnin);
 	INTEGER(dim)[1] = gMaxAEs;
 	INTEGER(dim)[2] = gNumBodySys;
 	INTEGER(dim)[3] = gChains;
 
-	setAttrib(samples, R_DimSymbol, dim);
+	Rf_setAttrib(samples, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 
@@ -1577,7 +1579,7 @@ SEXP c2121a::getL2Samples(double*** & data)
 	SEXP samples = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(samples = allocVector(REALSXP, gChains * gNumBodySys * (gIter - gBurnin)));
+	PROTECT(samples = Rf_allocVector(REALSXP, gChains * gNumBodySys * (gIter - gBurnin)));
 
 	int i = 0;
 	int c = 0;
@@ -1595,13 +1597,13 @@ SEXP c2121a::getL2Samples(double*** & data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 3));
+	PROTECT(dim = Rf_allocVector(INTSXP, 3));
 
 	INTEGER(dim)[0] = (gIter - gBurnin);
 	INTEGER(dim)[1] = gNumBodySys;
 	INTEGER(dim)[2] = gChains;
 
-	setAttrib(samples, R_DimSymbol, dim);
+	Rf_setAttrib(samples, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 
@@ -1613,7 +1615,7 @@ SEXP c2121a::getL3Samples(double** &data)
 	SEXP samples = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(samples = allocVector(REALSXP, gChains * (gIter - gBurnin)));
+	PROTECT(samples = Rf_allocVector(REALSXP, gChains * (gIter - gBurnin)));
 
 	int i = 0;
 	int c = 0;
@@ -1626,12 +1628,12 @@ SEXP c2121a::getL3Samples(double** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 2));
+	PROTECT(dim = Rf_allocVector(INTSXP, 2));
 
 	INTEGER(dim)[0] = (gIter - gBurnin);
 	INTEGER(dim)[1] = gChains;
 
-	setAttrib(samples, R_DimSymbol, dim);
+	Rf_setAttrib(samples, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 
@@ -1679,7 +1681,7 @@ SEXP c2121a::getL1Accept(int*** &data)
 	SEXP acc = R_NilValue;
 	SEXP dim = R_NilValue;
 
-	PROTECT(acc = allocVector(INTSXP, gChains * gNumBodySys * gMaxAEs));
+	PROTECT(acc = Rf_allocVector(INTSXP, gChains * gNumBodySys * gMaxAEs));
 
 	int i = 0;
 	int c = 0;
@@ -1697,13 +1699,13 @@ SEXP c2121a::getL1Accept(int*** &data)
 	free(data);
 	data = NULL;
 
-	PROTECT(dim = allocVector(INTSXP, 3));
+	PROTECT(dim = Rf_allocVector(INTSXP, 3));
 
 	INTEGER(dim)[0] = gMaxAEs;
 	INTEGER(dim)[1] = gNumBodySys;
 	INTEGER(dim)[2] = gChains;
 
-	setAttrib(acc, R_DimSymbol, dim);
+	Rf_setAttrib(acc, R_DimSymbol, dim);
 
 	UNPROTECT(2);
 

@@ -613,15 +613,15 @@ c212.interim.BB.dep.lev2.print.convergence.summary <- function(conv) {
 		if (alpha_pi_mon == 1) {
 			cat("alpha.pi:\n")
 			cat("---------\n")
-			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$alpha.pi_acc$rate),
-                                                max(conv$alpha.pi_acc$rate)))
+			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$alpha.pi_acc),
+                                                max(conv$alpha.pi_acc)))
 		}
 
 		if (beta_pi_mon == 1) {
 			cat("beta.pi:\n")
 			cat("--------\n")
-			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$beta.pi_acc$rate),
-                                                max(conv$beta.pi_acc$rate)))
+			print(sprintf("Min: %0.6f, Max: %0.6f", min(conv$beta.pi_acc),
+                                                max(conv$beta.pi_acc)))
 		}
 	}
 	else {
